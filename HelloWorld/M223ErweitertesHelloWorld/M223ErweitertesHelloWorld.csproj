@@ -9,6 +9,7 @@
 
     <ItemGroup>
       <PackageReference Include="Microsoft.NET.Build.Containers" Version="0.2.7" />
+        <PackageReference Include="MinimalApis.Extensions" />
     </ItemGroup>
 
 </Project>

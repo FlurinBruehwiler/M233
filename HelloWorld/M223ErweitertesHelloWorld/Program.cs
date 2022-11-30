@@ -9,3 +9,6 @@ app.MapGet("calculator/add/{term1:int}/{term2:int}", (int term1, int term2) =>
 });
 
 app.Run();
+
+
+public partial class Program { }
