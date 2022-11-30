@@ -14,7 +14,7 @@ public class EntryService
         _entryValidator = entryValidator;
     }
 
-    public async Task<Entry?> CreateEntryAsync(EntryDto newEntry)
+    public Entry? CreateEntry(EntryDto newEntry)
     {
         var entry = new Entry
         {
