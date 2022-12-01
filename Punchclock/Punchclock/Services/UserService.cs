@@ -15,40 +15,40 @@ public class UserService
         _punchclockDbContext = punchclockDbContext;
     }
     
-    public async Task RegisterUser(DtoAuthUser dtoAuthUser, HttpResponse httpResponse)
+    public async Task RegisterUser(UserDto userDto)
     {
-        if(string.IsNullOrWhiteSpace(dtoAuthUser.Name))
+        if(string.IsNullOrWhiteSpace(userDto.Name))
             throw new BadRequestException(Errors.UsernameEmpty);
             
-        if(string.IsNullOrWhiteSpace(dtoAuthUser.Password))
+        if(string.IsNullOrWhiteSpace(userDto.Password))
             throw new BadRequestException(Errors.PasswordEmpty);
         
-        if (await _punchclockDbContext.Users.AnyAsync(x => x.Name == dtoAuthUser.Name))
+        if (await _punchclockDbContext.Users.AnyAsync(x => x.Name == userDto.Name))
             throw new BadRequestException(Errors.UsernameAlreadyExists);
         
-        _authService.CreatePasswordHash(dtoAuthUser.Password, out var passwordHash, out var passwordSalt);
-        var user = new User
+        _authService.CreatePasswordHash(userDto.Password, out var passwordHash, out var passwordSalt);
+        var user = new ApplicationUser
         {
-            Name = dtoAuthUser.Name,
+            Name = userDto.Name,
             PasswordHash = passwordHash,
             PasswordSalt = passwordSalt
         };
         _punchclockDbContext.Users.Add(user);
         await _punchclockDbContext.SaveChangesAsync();
-        _authService.AppendAccessToken(httpResponse, user);
+        _authService.AppendAccessToken(user);
     }
 
-    public async Task LoginUser(DtoAuthUser dtoAuthUser, HttpResponse httpResponse)
+    public async Task LoginUser(UserDto userDto)
     {
-        var user = await GetUserByUsernameAsync(dtoAuthUser.Name);
+        var user = await GetUserByUsernameAsync(userDto.Name);
 
-        if (!_authService.VerifyPasswordHash(dtoAuthUser.Password, user.PasswordHash, user.PasswordSalt))
+        if (!_authService.VerifyPasswordHash(userDto.Password, user.PasswordHash, user.PasswordSalt))
             throw new BadRequestException(Errors.WrongPassword);
     
-        _authService.AppendAccessToken(httpResponse, user);
+        _authService.AppendAccessToken(user);
     }
     
-    public async Task<User> GetUserByUsernameAsync(string username)
+    public async Task<ApplicationUser> GetUserByUsernameAsync(string username)
     {
         var user = await _punchclockDbContext.Users.FirstOrDefaultAsync(x => x.Name == username);
         if(user is null)

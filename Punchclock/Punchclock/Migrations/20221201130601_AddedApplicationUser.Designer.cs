@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Punchclock.Models;
 
@@ -10,9 +11,11 @@ using Punchclock.Models;
 namespace Punchclock.Migrations
 {
     [DbContext(typeof(PunchclockDbContext))]
-    partial class PunchclockDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221201130601_AddedApplicationUser")]
+    partial class AddedApplicationUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.0");

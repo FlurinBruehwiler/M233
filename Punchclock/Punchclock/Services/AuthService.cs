@@ -11,17 +11,19 @@ namespace Punchclock.Services;
 public class AuthService
 {
     private readonly IOptions<AuthenticationConfiguration> _configuration;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public AuthService(IOptions<AuthenticationConfiguration> configuration)
+    public AuthService(IOptions<AuthenticationConfiguration> configuration, IHttpContextAccessor httpContextAccessor)
     {
         _configuration = configuration;
+        _httpContextAccessor = httpContextAccessor;
     }
     
-    public string CreateToken(User user)
+    public string CreateToken(ApplicationUser applicationUser)
     {
         var claims = new List<Claim>
         {
-            new(ClaimTypes.NameIdentifier, user.Name)
+            new(ClaimTypes.NameIdentifier, applicationUser.Name)
         };
 
         var key = new SymmetricSecurityKey(UTF8.GetBytes(_configuration.Value.Secret));
@@ -52,9 +54,14 @@ public class AuthService
         return computedHash.SequenceEqual(passwordHash);
     }
 
-    public void AppendAccessToken(HttpResponse httpResponse, User user)
+    public void AppendAccessToken(ApplicationUser applicationUser)
     {
-        httpResponse.Cookies.Append("dasToken", CreateToken(user), new CookieOptions
+        var httpResponse = _httpContextAccessor.HttpContext?.Response;
+
+        if (httpResponse is null)
+            throw new Exception("HttpResponse was null");
+        
+        httpResponse.Cookies.Append("dasToken", CreateToken(applicationUser), new CookieOptions
         {
             SameSite = SameSiteMode.Strict,
             Secure = true,

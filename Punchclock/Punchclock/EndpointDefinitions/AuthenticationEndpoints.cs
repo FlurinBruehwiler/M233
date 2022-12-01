@@ -8,19 +8,22 @@ public class AuthenticationEndpoints : IEndpoints
 {
     public void DefineEndpoints(WebApplication app)
     {
-        app.MapPost( "/register", Register);
-        app.MapPost( "/login", Login);
+        app.MapPost( "/register", Register)
+            .WithOpenApi();
+        
+        app.MapPost( "/login", Login)
+            .WithOpenApi();
     }
 
-    private async Task<IResult> Register(DtoAuthUser dtoAuthAuthUser, [FromServices] UserService userService, HttpResponse httpResponse)
+    private async Task<IResult> Register(UserDto userDtoAuth, [FromServices] UserService userService)
     {
-        await userService.RegisterUser(dtoAuthAuthUser, httpResponse);
+        await userService.RegisterUser(userDtoAuth);
         return Results.Ok();
     }
     
-    private async Task<IResult> Login(DtoAuthUser dtoAuthUser, [FromServices] UserService userService, HttpResponse httpResponse)
+    private async Task<IResult> Login(UserDto userDto, [FromServices] UserService userService)
     {
-        await userService.LoginUser(dtoAuthUser, httpResponse);
+        await userService.LoginUser(userDto);
         return Results.Ok();
     }
 }

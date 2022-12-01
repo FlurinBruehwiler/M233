@@ -19,7 +19,8 @@ public class EntryService
         {
             CheckIn = newEntry.CheckIn,
             CheckOut = newEntry.CheckOut,
-            Category = await _punchclockDbContext.Categories.FirstAsync(x => x.Id == newEntry.Category)
+            Category = await _punchclockDbContext.Categories.FirstAsync(x => x.Id == newEntry.Category),
+            ApplicationUser = null
         };
         
         _punchclockDbContext.Entries.Add(entry);
