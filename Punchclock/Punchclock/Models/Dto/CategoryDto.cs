@@ -1,7 +1,7 @@
-namespace Punchclock.Models;
+namespace Punchclock.Models.Dto;
 
 public class CategoryDto
 {
     public long Id { get; set; }
-    public string Title { get; set; }
+    public required string Title { get; set; }
 }

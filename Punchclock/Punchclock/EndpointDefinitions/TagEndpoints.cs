@@ -1,4 +1,5 @@
 using Punchclock.Models;
+using Punchclock.Models.Dto;
 using Punchclock.Services;
 
 namespace Punchclock.EndpointDefinitions;
@@ -7,10 +8,17 @@ public class TagEndpoints : IEndpoints
 {
     public void DefineEndpoints(WebApplication app)
     {
-        app.MapGet("/entries", GetAllTags);
-        app.MapPost("/entries", CreateTag);
-        app.MapDelete("/entries/{id:long}", DeleteTag);
-        app.MapPatch("/entries", PatchTag);
+        app.MapGet("/tags", GetAllTags)
+            .WithOpenApi();
+        
+        app.MapPost("/tags", CreateTag)
+            .WithOpenApi();
+        
+        app.MapDelete("/tags/{id:long}", DeleteTag)
+            .WithOpenApi();
+        
+        app.MapPatch("/tags", PatchTag)
+            .WithOpenApi();
     }
     
     private async Task<IResult> PatchTag(TagDto entry, TagService tagService, PunchclockDbContext punchclockDbContext)

@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Punchclock.Models;
+using Punchclock.Models.Dto;
 
 namespace Punchclock.Services;
 
@@ -12,12 +13,13 @@ public class EntryService
         _punchclockDbContext = punchclockDbContext;
     }
 
-    public Entry CreateEntry(EntryDto newEntry)
+    public async Task<Entry> CreateEntry(EntryDto newEntry)
     {
         var entry = new Entry
         {
             CheckIn = newEntry.CheckIn,
-            CheckOut = newEntry.CheckOut
+            CheckOut = newEntry.CheckOut,
+            Category = await _punchclockDbContext.Categories.FirstAsync(x => x.Id == newEntry.Category)
         };
         
         _punchclockDbContext.Entries.Add(entry);

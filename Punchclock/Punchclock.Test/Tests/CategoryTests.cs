@@ -1,4 +1,4 @@
-namespace Punchclock.Test;
+namespace Punchclock.Test.Tests;
 
 public class CategoryTests
 {

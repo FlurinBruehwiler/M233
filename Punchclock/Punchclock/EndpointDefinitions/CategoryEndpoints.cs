@@ -1,4 +1,5 @@
 using Punchclock.Models;
+using Punchclock.Models.Dto;
 using Punchclock.Services;
 
 namespace Punchclock.EndpointDefinitions;
@@ -7,10 +8,17 @@ public class CategoryEndpoints : IEndpoints
 {
     public void DefineEndpoints(WebApplication app)
     {
-        app.MapGet("/entries", GetAllCategories);
-        app.MapPost("/entries", CreateCategory);
-        app.MapDelete("/entries/{id:long}", DeleteCategory);
-        app.MapPatch("/entries", PatchCategory);
+        app.MapGet("/categories", GetAllCategories)
+            .WithOpenApi();
+        
+        app.MapPost("/categories", CreateCategory)
+            .WithOpenApi();
+        
+        app.MapDelete("/categories/{id:long}", DeleteCategory)
+            .WithOpenApi();
+        
+        app.MapPatch("/categories", PatchCategory)
+            .WithOpenApi();
     }
     
     private async Task<IResult> PatchCategory(CategoryDto category, CategoryService categoryService, PunchclockDbContext punchclockDbContext)

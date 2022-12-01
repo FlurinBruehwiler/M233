@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Punchclock.Models;
+using Punchclock.Models.Dto;
 
 namespace Punchclock.Services;
 

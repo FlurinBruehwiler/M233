@@ -1,5 +1,6 @@
 using FluentValidation;
 using Punchclock.Models;
+using Punchclock.Models.Dto;
 
 namespace Punchclock.Validators;
 

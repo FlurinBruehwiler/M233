@@ -1,10 +1,10 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
-using Punchclock.Models;
+using Punchclock.Models.Dto;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
-namespace Punchclock.Test;
+namespace Punchclock.Test.Tests;
 
 public class EntryTests
 {
@@ -65,7 +65,7 @@ public class EntryTests
     {
         await using var application = new PunchclockApplication();
         var initialEntry = GetDemoEntry();
-        var inputEntry = new { CheckIn = DateTime.Parse("14.09.204"), CheckOut = DateTime.Now, Id = 1l };
+        var inputEntry = new { CheckIn = DateTime.Parse("14.09.204"), CheckOut = DateTime.Now, Id = 1L };
         
         using var client = application.CreateClient();
         using var _ = await client.PostAsJsonAsync("/entries", initialEntry);
