@@ -9,7 +9,7 @@ public class EntryValidators : AbstractValidator<EntryDto>
     {
         RuleFor(x => x.CheckOut)
             .NotNull()
-            .Must((entry, checkOut) => checkOut < entry.CheckIn)
+            .Must((entry, checkOut) => checkOut > entry.CheckIn)
             .WithMessage("CheckOut must be after CheckIn");
 
         RuleFor(x => x.CheckIn)

@@ -12,14 +12,14 @@ public class CategoryEndpoints : IEndpoints
             .WithOpenApi();
         
         app.MapPost("/categories", CreateCategory)
-            .AddEndpointFilter<ValidatorFilter<Category>>()
+            .AddEndpointFilter<ValidatorFilter<CategoryDto>>()
             .WithOpenApi();
         
         app.MapDelete("/categories/{id:long}", DeleteCategory)
             .WithOpenApi();
         
         app.MapPut("/categories", PutCategory)
-            .AddEndpointFilter<ValidatorFilter<Category>>()
+            .AddEndpointFilter<ValidatorFilter<CategoryDto>>()
             .WithOpenApi();
     }
     

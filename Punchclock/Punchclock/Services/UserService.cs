@@ -59,24 +59,17 @@ public class UserService
         return user;
     }
 
-    private int GetId()
+    private string? GetUsername()
     {
         if (_httpContextAccessor.HttpContext == null)
-            return -1;
+            return null;
             
-        var idString = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-        if (int.TryParse(idString, out int id))
-        {
-            return id;
-        }
-
-        return -1;
+        return _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
     }
 
     public ApplicationUser GetUser()
     {
-        return _punchclockDbContext.Users.FirstOrDefault(x => x.Id == GetId()) ?? throw new Exception();
+        return _punchclockDbContext.Users.FirstOrDefault(x => x.Name == GetUsername()) ?? throw new Exception();
     }
 
     public ApplicationUser? GetUserById(int id)

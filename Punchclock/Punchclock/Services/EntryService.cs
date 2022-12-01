@@ -33,6 +33,7 @@ public class EntryService
     {
         return await _punchclockDbContext.Entries
             .Where(x => x.ApplicationUser == _userService.GetUser())
+            .Include(x => x.Tags)
             .ToListAsync();
     }
 

@@ -12,14 +12,14 @@ public class TagEndpoints : IEndpoints
             .WithOpenApi();
         
         app.MapPost("/tags", CreateTag)
-            .AddEndpointFilter<ValidatorFilter<Tag>>()
+            .AddEndpointFilter<ValidatorFilter<TagDto>>()
             .WithOpenApi();
         
         app.MapDelete("/tags/{id:long}", DeleteTag)
             .WithOpenApi();
         
         app.MapPut("/tags", PutTag)
-            .AddEndpointFilter<ValidatorFilter<Tag>>()
+            .AddEndpointFilter<ValidatorFilter<TagDto>>()
             .WithOpenApi();
     }
     

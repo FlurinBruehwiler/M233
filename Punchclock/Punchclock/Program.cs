@@ -1,10 +1,13 @@
+using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Punchclock;
 using Punchclock.Models;
+using Punchclock.Models.Dto;
 using Punchclock.Services;
+using Punchclock.Validators;
 using static System.Text.Encoding;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,11 +15,20 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddScoped<EntryService>();
 builder.Services.AddScoped<CategoryService>();
 builder.Services.AddScoped<TagService>();
+builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<UserService>();
+
+builder.Services.AddScoped<IValidator<CategoryDto>, CategoryValidators>();
+builder.Services.AddScoped<IValidator<EntryDto>, EntryValidators>();
+builder.Services.AddScoped<IValidator<TagDto>, TagValidators>();
+
 builder.Services.AddDbContext<PunchclockDbContext>(options =>
 {
     options.UseSqlite("Data Source=db.db");
     options.EnableSensitiveDataLogging();
 });
+
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -28,7 +40,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(UTF8.GetBytes(builder.Configuration.GetRequiredSection("Authentication:Secret").Value!)),
+            IssuerSigningKey =
+                new SymmetricSecurityKey(UTF8.GetBytes(builder.Configuration.GetRequiredSection("Authentication:Secret")
+                    .Value!)),
             ValidateIssuer = false,
             ValidateAudience = false
         };
@@ -43,7 +57,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 
-
 var app = builder.Build();
 
 app.UseExceptionHandler(appError =>
@@ -52,13 +65,13 @@ app.UseExceptionHandler(appError =>
     {
         var exceptionHandlerPathFeature =
             context.Features.Get<IExceptionHandlerPathFeature>();
-        
+
         if (exceptionHandlerPathFeature?.Error is not BadRequestException exception)
             return;
 
         context.Response.ContentType = "application/json";
         context.Response.StatusCode = StatusCodes.Status400BadRequest;
-        
+
         await context.Response.WriteAsJsonAsync(exception.Error);
     });
 });

@@ -12,14 +12,14 @@ public class EntryEndpoints : IEndpoints
             .WithOpenApi();
         
         app.MapPost("/entries", CreateEntry)
-            .AddEndpointFilter<ValidatorFilter<Entry>>()
+            .AddEndpointFilter<ValidatorFilter<EntryDto>>()
             .WithOpenApi();
         
         app.MapDelete("/entries/{id:long}", DeleteEntry)
             .WithOpenApi();
         
         app.MapPut("/entries", PutEntry)
-            .AddEndpointFilter<ValidatorFilter<Entry>>()
+            .AddEndpointFilter<ValidatorFilter<EntryDto>>()
             .WithOpenApi();
     }
 
@@ -40,7 +40,15 @@ public class EntryEndpoints : IEndpoints
 
     private async Task<IResult> GetAllEntries(EntryService entryService)
     {
-        return Results.Ok(await entryService.FindAllAsync());
+        var entries = await entryService.FindAllAsync();
+        return Results.Ok(entries.Select(x => new EntryDto
+        {
+            Id = x.Id,
+            Category = x.CategoryId,
+            CheckIn = x.CheckIn,
+            CheckOut = x.CheckOut,
+            Tags = x.Tags.Select(y => y.Id).ToList()
+        }));
     }
 
     private async Task<IResult> CreateEntry(EntryDto entry, EntryService entryService, PunchclockDbContext punchclockDbContext)
