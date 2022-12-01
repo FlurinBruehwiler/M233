@@ -2,5 +2,5 @@ namespace Punchclock;
 
 public class AuthenticationConfiguration
 {
-    public string Secret { get; set; }
+    public required string Secret { get; set; }
 }

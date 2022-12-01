@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using Punchclock.Models;
 using Punchclock.Models.Dto;
@@ -8,11 +9,13 @@ public class UserService
 {
     private readonly AuthService _authService;
     private readonly PunchclockDbContext _punchclockDbContext;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public UserService(AuthService authService, PunchclockDbContext punchclockDbContext)
+    public UserService(AuthService authService, PunchclockDbContext punchclockDbContext, IHttpContextAccessor httpContextAccessor)
     {
         _authService = authService;
         _punchclockDbContext = punchclockDbContext;
+        _httpContextAccessor = httpContextAccessor;
     }
     
     public async Task RegisterUser(UserDto userDto)
@@ -47,12 +50,37 @@ public class UserService
     
         _authService.AppendAccessToken(user);
     }
-    
-    public async Task<ApplicationUser> GetUserByUsernameAsync(string username)
+
+    private async Task<ApplicationUser> GetUserByUsernameAsync(string username)
     {
         var user = await _punchclockDbContext.Users.FirstOrDefaultAsync(x => x.Name == username);
         if(user is null)
             throw new BadRequestException(Errors.UserNotFound);
         return user;
+    }
+
+    private int GetId()
+    {
+        if (_httpContextAccessor.HttpContext == null)
+            return -1;
+            
+        var idString = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (int.TryParse(idString, out int id))
+        {
+            return id;
+        }
+
+        return -1;
+    }
+
+    public ApplicationUser GetUser()
+    {
+        return _punchclockDbContext.Users.FirstOrDefault(x => x.Id == GetId()) ?? throw new Exception();
+    }
+
+    public ApplicationUser? GetUserById(int id)
+    {
+        return _punchclockDbContext.Users.FirstOrDefault(x => x.Id == id);
     }
 }

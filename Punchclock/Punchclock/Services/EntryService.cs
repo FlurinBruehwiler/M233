@@ -7,10 +7,12 @@ namespace Punchclock.Services;
 public class EntryService
 {
     private readonly PunchclockDbContext _punchclockDbContext;
+    private readonly UserService _userService;
 
-    public EntryService(PunchclockDbContext punchclockDbContext)
+    public EntryService(PunchclockDbContext punchclockDbContext, UserService userService)
     {
         _punchclockDbContext = punchclockDbContext;
+        _userService = userService;
     }
 
     public async Task<Entry> CreateEntry(EntryDto newEntry)
@@ -20,7 +22,7 @@ public class EntryService
             CheckIn = newEntry.CheckIn,
             CheckOut = newEntry.CheckOut,
             Category = await _punchclockDbContext.Categories.FirstAsync(x => x.Id == newEntry.Category),
-            ApplicationUser = null
+            ApplicationUser = _userService.GetUser()
         };
         
         _punchclockDbContext.Entries.Add(entry);
@@ -29,7 +31,9 @@ public class EntryService
 
     public async Task<List<Entry>> FindAllAsync()
     {
-        return await _punchclockDbContext.Entries.ToListAsync();
+        return await _punchclockDbContext.Entries
+            .Where(x => x.ApplicationUser == _userService.GetUser())
+            .ToListAsync();
     }
 
     public async Task DeleteEntryAsync(long id)
@@ -37,6 +41,10 @@ public class EntryService
         var entryToRemove = await _punchclockDbContext.Entries.FirstOrDefaultAsync(x => x.Id == id);
         if (entryToRemove is null)
             return;
+
+        if (entryToRemove.ApplicationUser != _userService.GetUser())
+            return;
+        
         _punchclockDbContext.Entries.Remove(entryToRemove);
     }
 
@@ -44,6 +52,9 @@ public class EntryService
     {
         var entryToPatch = await _punchclockDbContext.Entries.FirstOrDefaultAsync(x => x.Id == patchedEntry.Id);
         if (entryToPatch is null)
+            return null;
+        
+        if (entryToPatch.ApplicationUser != _userService.GetUser())
             return null;
         
         entryToPatch.CheckIn = patchedEntry.CheckIn;

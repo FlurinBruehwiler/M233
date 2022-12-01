@@ -6,5 +6,5 @@ public class ApplicationUser
     public required string Name { get; set; }
     public required byte[] PasswordHash { get; set; }
     public required byte[] PasswordSalt { get; set; }
-    public List<Entry> Entries { get; set; }
+    public List<Entry> Entries { get; set; } = null!;
 }
