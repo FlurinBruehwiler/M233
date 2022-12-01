@@ -1,7 +1,6 @@
 using Punchclock.Models;
 using Punchclock.Models.Dto;
 using Punchclock.Services;
-using Punchclock.Validators;
 
 namespace Punchclock.EndpointDefinitions;
 
