@@ -39,7 +39,7 @@ public class EntryService
         _punchclockDbContext.Entries.Remove(entryToRemove);
     }
 
-    public async Task<Entry?> PatchEntryAsync(EntryDto patchedEntry)
+    public async Task<Entry?> PutEntryAsync(EntryDto patchedEntry)
     {
         var entryToPatch = await _punchclockDbContext.Entries.FirstOrDefaultAsync(x => x.Id == patchedEntry.Id);
         if (entryToPatch is null)

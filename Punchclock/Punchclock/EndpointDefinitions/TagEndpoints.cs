@@ -12,18 +12,20 @@ public class TagEndpoints : IEndpoints
             .WithOpenApi();
         
         app.MapPost("/tags", CreateTag)
+            .AddEndpointFilter<ValidatorFilter<Tag>>()
             .WithOpenApi();
         
         app.MapDelete("/tags/{id:long}", DeleteTag)
             .WithOpenApi();
         
-        app.MapPatch("/tags", PatchTag)
+        app.MapPut("/tags", PutTag)
+            .AddEndpointFilter<ValidatorFilter<Tag>>()
             .WithOpenApi();
     }
     
-    private async Task<IResult> PatchTag(TagDto entry, TagService tagService, PunchclockDbContext punchclockDbContext)
+    private async Task<IResult> PutTag(TagDto entry, TagService tagService, PunchclockDbContext punchclockDbContext)
     {
-        var patchedTag = await tagService.PatchTagAsync(entry);
+        var patchedTag = await tagService.PutTagAsync(entry);
         if (patchedTag is null) return Results.BadRequest();
         await punchclockDbContext.SaveChangesAsync();
         return Results.Ok(new TagDto { Id = patchedTag.Id,Title = patchedTag.Title});

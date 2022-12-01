@@ -1,6 +1,7 @@
 using Punchclock.Models;
 using Punchclock.Models.Dto;
 using Punchclock.Services;
+using Punchclock.Validators;
 
 namespace Punchclock.EndpointDefinitions;
 
@@ -12,18 +13,20 @@ public class CategoryEndpoints : IEndpoints
             .WithOpenApi();
         
         app.MapPost("/categories", CreateCategory)
+            .AddEndpointFilter<ValidatorFilter<Category>>()
             .WithOpenApi();
         
         app.MapDelete("/categories/{id:long}", DeleteCategory)
             .WithOpenApi();
         
-        app.MapPatch("/categories", PatchCategory)
+        app.MapPut("/categories", PutCategory)
+            .AddEndpointFilter<ValidatorFilter<Category>>()
             .WithOpenApi();
     }
     
-    private async Task<IResult> PatchCategory(CategoryDto category, CategoryService categoryService, PunchclockDbContext punchclockDbContext)
+    private async Task<IResult> PutCategory(CategoryDto category, CategoryService categoryService, PunchclockDbContext punchclockDbContext)
     {
-        var patchedCategory = await categoryService.PatchCategoryAsync(category);
+        var patchedCategory = await categoryService.PutCategoryAsync(category);
         if (patchedCategory is null) return Results.BadRequest();
         await punchclockDbContext.SaveChangesAsync();
         return Results.Ok(new CategoryDto { Id = patchedCategory.Id,Title = patchedCategory.Title});

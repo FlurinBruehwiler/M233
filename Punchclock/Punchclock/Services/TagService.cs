@@ -37,7 +37,7 @@ public class TagService
         _punchclockDbContext.Tags.Remove(tagToRemove);
     }
 
-    public async Task<Tag?> PatchTagAsync(TagDto patchedTag)
+    public async Task<Tag?> PutTagAsync(TagDto patchedTag)
     {
         var tagToPatch = await _punchclockDbContext.Tags
             .FirstOrDefaultAsync(x => x.Id == patchedTag.Id);

@@ -11,19 +11,21 @@ public class EntryEndpoints : IEndpoints
         app.MapGet("/entries", GetAllEntries)
             .WithOpenApi();
         
-        app.MapPost("/entries", CreateEntry).AddEndpointFilter<ValidatorFilter<Entry>>()
+        app.MapPost("/entries", CreateEntry)
+            .AddEndpointFilter<ValidatorFilter<Entry>>()
             .WithOpenApi();
         
         app.MapDelete("/entries/{id:long}", DeleteEntry)
             .WithOpenApi();
         
-        app.MapPatch("/entries", PatchEntry).AddEndpointFilter<ValidatorFilter<Entry>>()
+        app.MapPut("/entries", PutEntry)
+            .AddEndpointFilter<ValidatorFilter<Entry>>()
             .WithOpenApi();
     }
 
-    private async Task<IResult> PatchEntry(EntryDto entry, EntryService entryService, PunchclockDbContext punchclockDbContext)
+    private async Task<IResult> PutEntry(EntryDto entry, EntryService entryService, PunchclockDbContext punchclockDbContext)
     {
-        var patchedEntry = await entryService.PatchEntryAsync(entry);
+        var patchedEntry = await entryService.PutEntryAsync(entry);
         if (patchedEntry is null) return Results.BadRequest();
         await punchclockDbContext.SaveChangesAsync();
         return Results.Ok(new EntryDto { Id = patchedEntry.Id, CheckIn = patchedEntry.CheckIn, CheckOut = patchedEntry.CheckOut });

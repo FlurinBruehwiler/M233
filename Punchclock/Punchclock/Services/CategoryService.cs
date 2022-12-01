@@ -37,7 +37,7 @@ public class CategoryService
         _punchclockDbContext.Categories.Remove(categoryToRemove);
     }
 
-    public async Task<Category?> PatchCategoryAsync(CategoryDto patchedCategory)
+    public async Task<Category?> PutCategoryAsync(CategoryDto patchedCategory)
     {
         var categoryToPatch = await _punchclockDbContext.Categories.FirstOrDefaultAsync(x => x.Id == patchedCategory.Id);
         if (categoryToPatch is null)

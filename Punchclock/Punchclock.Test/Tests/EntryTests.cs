@@ -61,7 +61,7 @@ public class EntryTests
     }
     
     [Fact]
-    public async Task PatchEntry()
+    public async Task PutEntry()
     {
         await using var application = new PunchclockApplication();
         var initialEntry = GetDemoEntry();
@@ -69,7 +69,7 @@ public class EntryTests
         
         using var client = application.CreateClient();
         using var _ = await client.PostAsJsonAsync("/entries", initialEntry);
-        using var response = await client.PatchAsJsonAsync("/entries", inputEntry);
+        using var response = await client.PutAsJsonAsync("/entries", inputEntry);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var textRes = await response.Content.ReadAsStringAsync();
