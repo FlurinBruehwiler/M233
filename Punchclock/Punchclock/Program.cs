@@ -10,7 +10,7 @@ builder.Services.AddScoped<CategoryService>();
 builder.Services.AddScoped<TagService>();
 builder.Services.AddDbContext<PunchclockDbContext>(options =>
 {
-    options.UseSqlite("db.sql");
+    options.UseSqlite("Data Source=db.db");
     options.EnableSensitiveDataLogging();
 });
 

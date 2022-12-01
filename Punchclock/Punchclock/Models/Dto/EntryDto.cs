@@ -6,5 +6,5 @@ public class EntryDto
     public required DateTime CheckIn { get; set; }
     public required DateTime CheckOut { get; set; }
     public long Category { get; set; }
-    public List<long> Entries { get; set; }
+    public List<long> Tags { get; set; }
 }

@@ -7,5 +7,5 @@ public class Entry
     public required DateTime CheckOut { get; set; }
     public required Category Category { get; set; }
     public long CategoryId { get; set; }
-    public List<Tag> Tags { get; set; }
+    public List<Tag> Tags { get; set; } = null!;
 }
