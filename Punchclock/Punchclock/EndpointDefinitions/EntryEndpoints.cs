@@ -8,9 +8,9 @@ public class EntryEndpoints : IEndpoints
     public void DefineEndpoints(WebApplication app)
     {
         app.MapGet("/entries", GetAllEntries);
-        app.MapPost("/entries", CreateEntry);
+        app.MapPost("/entries", CreateEntry).AddEndpointFilter<ValidatorFilter<Entry>>();
         app.MapDelete("/entries/{id:long}", DeleteEntry);
-        app.MapPatch("/entries", PatchEntry);
+        app.MapPatch("/entries", PatchEntry).AddEndpointFilter<ValidatorFilter<Entry>>();
     }
 
     private async Task<IResult> PatchEntry(EntryDto entry, EntryService entryService, PunchclockDbContext punchclockDbContext)
@@ -36,7 +36,6 @@ public class EntryEndpoints : IEndpoints
     private async Task<IResult> CreateEntry(EntryDto entry, EntryService entryService, PunchclockDbContext punchclockDbContext)
     {
         var createdEntry = entryService.CreateEntry(entry);
-        if (createdEntry is null) return Results.BadRequest();
         await punchclockDbContext.SaveChangesAsync();
         return Results.Ok(new EntryDto { Id = createdEntry.Id, CheckIn = createdEntry.CheckIn, CheckOut = createdEntry.CheckOut });
     }

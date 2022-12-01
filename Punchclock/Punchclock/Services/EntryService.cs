@@ -6,24 +6,19 @@ namespace Punchclock.Services;
 public class EntryService
 {
     private readonly PunchclockDbContext _punchclockDbContext;
-    private readonly EntryValidator _entryValidator;
 
-    public EntryService(PunchclockDbContext punchclockDbContext, EntryValidator entryValidator)
+    public EntryService(PunchclockDbContext punchclockDbContext)
     {
         _punchclockDbContext = punchclockDbContext;
-        _entryValidator = entryValidator;
     }
 
-    public Entry? CreateEntry(EntryDto newEntry)
+    public Entry CreateEntry(EntryDto newEntry)
     {
         var entry = new Entry
         {
             CheckIn = newEntry.CheckIn,
             CheckOut = newEntry.CheckOut
         };
-
-        if (!_entryValidator.IsValid(entry))
-            return null;
         
         _punchclockDbContext.Entries.Add(entry);
         return entry;
@@ -44,15 +39,6 @@ public class EntryService
 
     public async Task<Entry?> PatchEntryAsync(EntryDto patchedEntry)
     {
-        if (!_entryValidator.IsValid(new Entry
-            {
-                CheckIn = patchedEntry.CheckIn,
-                CheckOut = patchedEntry.CheckOut
-            }))
-        {
-            return null;
-        }
-
         var entryToPatch = await _punchclockDbContext.Entries.FirstOrDefaultAsync(x => x.Id == patchedEntry.Id);
         if (entryToPatch is null)
             return null;

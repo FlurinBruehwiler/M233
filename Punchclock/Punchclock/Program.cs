@@ -5,7 +5,6 @@ using Punchclock.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddScoped<EntryValidator>();
 builder.Services.AddScoped<EntryService>();
 builder.Services.AddScoped<CategoryService>();
 builder.Services.AddScoped<TagService>();

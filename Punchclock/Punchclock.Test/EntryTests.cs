@@ -1,27 +1,23 @@
 using System.Net;
-using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using Punchclock.Models;
-using Xunit.Abstractions;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace Punchclock.Test;
 
 public class EntryTests
 {
-    private readonly ITestOutputHelper _testOutputHelper;
-
-    public EntryTests(ITestOutputHelper testOutputHelper)
+    private DemoEntry GetDemoEntry()
     {
-        _testOutputHelper = testOutputHelper;
+        return new DemoEntry{ CheckIn = DateTime.Parse("13.09.204"), CheckOut = DateTime.Now };
     }
     
     [Fact]
     public async Task CreateEntry()
     {
         await using var application = new PunchclockApplication();
-        var inputEntry = new { CheckIn = DateTime.Parse("13.09.204"), CheckOut = DateTime.Now };
+        var inputEntry = GetDemoEntry();
         
         using var client = application.CreateClient();
         using var response = await client.PostAsJsonAsync("/entries", inputEntry);
@@ -38,8 +34,8 @@ public class EntryTests
         await using var application = new PunchclockApplication();
         
         using var client = application.CreateClient();
-        
-        var inputEntry = new { CheckIn = DateTime.Parse("13.09.204"), CheckOut = DateTime.Now };
+
+        var inputEntry = GetDemoEntry();
         using var _ = await client.PostAsJsonAsync("/entries", inputEntry);
         
         using var response = await client.GetAsync("/entries");
@@ -56,7 +52,7 @@ public class EntryTests
         await using var application = new PunchclockApplication();
         
         using var client = application.CreateClient();
-        var inputEntry = new { CheckIn = DateTime.Parse("13.09.204"), CheckOut = DateTime.Now };
+        var inputEntry = GetDemoEntry();
         using var _ = await client.PostAsJsonAsync("/entries", inputEntry);
         
         using var response = await client.DeleteAsync("/entries/1");
@@ -68,7 +64,7 @@ public class EntryTests
     public async Task PatchEntry()
     {
         await using var application = new PunchclockApplication();
-        var initialEntry = new { CheckIn = DateTime.Parse("13.09.204"), CheckOut = DateTime.Now };
+        var initialEntry = GetDemoEntry();
         var inputEntry = new { CheckIn = DateTime.Parse("14.09.204"), CheckOut = DateTime.Now, Id = 1l };
         
         using var client = application.CreateClient();
