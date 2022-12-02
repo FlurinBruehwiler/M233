@@ -33,7 +33,7 @@ public class TagService
     {
         var tagToRemove = await _punchclockDbContext.Tags.FirstOrDefaultAsync(x => x.Id == id);
         if (tagToRemove is null)
-            return;
+            throw new BadRequestException(Errors.TagNotFound);
         _punchclockDbContext.Tags.Remove(tagToRemove);
     }
 
@@ -41,9 +41,9 @@ public class TagService
     {
         var tagToPatch = await _punchclockDbContext.Tags
             .FirstOrDefaultAsync(x => x.Id == patchedTag.Id);
-        
+
         if (tagToPatch is null)
-            return null;
+            throw new BadRequestException(Errors.TagNotFound);
         
         tagToPatch.Title = patchedTag.Title;
 

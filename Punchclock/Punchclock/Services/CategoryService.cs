@@ -33,7 +33,8 @@ public class CategoryService
     {
         var categoryToRemove = await _punchclockDbContext.Categories.FirstOrDefaultAsync(x => x.Id == id);
         if (categoryToRemove is null)
-            return;
+            throw new BadRequestException(Errors.CategoryNotFound);
+            
         _punchclockDbContext.Categories.Remove(categoryToRemove);
     }
 
@@ -41,7 +42,7 @@ public class CategoryService
     {
         var categoryToPatch = await _punchclockDbContext.Categories.FirstOrDefaultAsync(x => x.Id == patchedCategory.Id);
         if (categoryToPatch is null)
-            return null;
+            throw new BadRequestException(Errors.CategoryNotFound);
         
         categoryToPatch.Title = patchedCategory.Title;
 

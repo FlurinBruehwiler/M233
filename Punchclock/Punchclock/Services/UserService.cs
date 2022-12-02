@@ -69,7 +69,10 @@ public class UserService
 
     public ApplicationUser GetUser()
     {
-        return _punchclockDbContext.Users.FirstOrDefault(x => x.Name == GetUsername()) ?? throw new Exception();
+        var username = GetUsername();
+        if (username is null)
+            throw new BadRequestException(Errors.NoAuth);
+        return _punchclockDbContext.Users.FirstOrDefault(x => x.Name == username) ?? throw new Exception();
     }
 
     public ApplicationUser? GetUserById(int id)

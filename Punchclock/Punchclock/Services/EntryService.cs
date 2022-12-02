@@ -31,32 +31,36 @@ public class EntryService
 
     public async Task<List<Entry>> FindAllAsync()
     {
+        var user = _userService.GetUser();
         return await _punchclockDbContext.Entries
-            .Where(x => x.ApplicationUser == _userService.GetUser())
+            .Where(x => x.ApplicationUser == user)
             .Include(x => x.Tags)
             .ToListAsync();
     }
 
     public async Task DeleteEntryAsync(long id)
     {
-        var entryToRemove = await _punchclockDbContext.Entries.FirstOrDefaultAsync(x => x.Id == id);
-        if (entryToRemove is null)
-            return;
+        var entryToRemove = await _punchclockDbContext.Entries
+            .FirstOrDefaultAsync(x => x.Id == id);
 
-        if (entryToRemove.ApplicationUser != _userService.GetUser())
-            return;
+        if (entryToRemove is null)
+            throw new BadRequestException(Errors.EntryNotFound);
+
+        if (entryToRemove.ApplicationUserId != _userService.GetUser().Id)
+            throw new BadRequestException(Errors.UserHasNoRights);
         
         _punchclockDbContext.Entries.Remove(entryToRemove);
     }
 
     public async Task<Entry?> PutEntryAsync(EntryDto patchedEntry)
     {
-        var entryToPatch = await _punchclockDbContext.Entries.FirstOrDefaultAsync(x => x.Id == patchedEntry.Id);
+        var entryToPatch = await _punchclockDbContext.Entries
+            .FirstOrDefaultAsync(x => x.Id == patchedEntry.Id);
         if (entryToPatch is null)
-            return null;
+            throw new BadRequestException(Errors.EntryNotFound);
         
-        if (entryToPatch.ApplicationUser != _userService.GetUser())
-            return null;
+        if (entryToPatch.ApplicationUserId != _userService.GetUser().Id)
+            throw new BadRequestException(Errors.UserHasNoRights);
         
         entryToPatch.CheckIn = patchedEntry.CheckIn;
         entryToPatch.CheckOut = patchedEntry.CheckOut;
