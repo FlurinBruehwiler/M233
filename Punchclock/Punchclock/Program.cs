@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using Punchclock.Configurations;
 using Punchclock.Errors;
 using Punchclock.Extensions;
+using Punchclock.Mapper;
 using Punchclock.Models.Db;
 using Punchclock.Models.Dto;
 using Punchclock.Services;

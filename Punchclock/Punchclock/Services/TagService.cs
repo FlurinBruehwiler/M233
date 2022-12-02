@@ -27,7 +27,9 @@ public class TagService
 
     public async Task<List<Tag>> FindAllAsync()
     {
-        return await _punchclockDbContext.Tags.ToListAsync();
+        return await _punchclockDbContext.Tags
+            .Include(x => x.Entries)
+            .ToListAsync();
     }
 
     public async Task DeleteTagAsync(long id)

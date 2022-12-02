@@ -27,7 +27,9 @@ public class CategoryService
 
     public async Task<List<Category>> FindAllAsync()
     {
-        return await _punchclockDbContext.Categories.ToListAsync();
+        return await _punchclockDbContext.Categories
+            .Include(x => x.Entries)
+            .ToListAsync();
     }
 
     public async Task DeleteCategoryAsync(long id)

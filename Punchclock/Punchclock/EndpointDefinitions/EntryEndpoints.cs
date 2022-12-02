@@ -1,3 +1,4 @@
+using Punchclock.Mapper;
 using Punchclock.Models.Db;
 using Punchclock.Models.Dto;
 using Punchclock.Services;
@@ -33,7 +34,7 @@ public class EntryEndpoints : IEndpoints
         var patchedEntry = await entryService.PutEntryAsync(entry);
         if (patchedEntry is null) return Results.BadRequest();
         await punchclockDbContext.SaveChangesAsync();
-        return Results.Ok(new EntryDto { Id = patchedEntry.Id, CheckIn = patchedEntry.CheckIn, CheckOut = patchedEntry.CheckOut });
+        return Results.Ok(patchedEntry.ToDto());
     }
 
     private async Task<IResult> DeleteEntry(long id, EntryService entryService, PunchclockDbContext punchclockDbContext)
@@ -46,20 +47,13 @@ public class EntryEndpoints : IEndpoints
     private async Task<IResult> GetAllEntries(EntryService entryService)
     {
         var entries = await entryService.FindAllAsync();
-        return Results.Ok(entries.Select(x => new EntryDto
-        {
-            Id = x.Id,
-            Category = x.CategoryId,
-            CheckIn = x.CheckIn,
-            CheckOut = x.CheckOut,
-            Tags = x.Tags.Select(y => y.Id).ToList()
-        }));
+        return Results.Ok(entries.Select(x => x.ToDto()));
     }
 
     private async Task<IResult> CreateEntry(EntryDto entry, EntryService entryService, PunchclockDbContext punchclockDbContext)
     {
         var createdEntry = await entryService.CreateEntry(entry);
         await punchclockDbContext.SaveChangesAsync();
-        return Results.Ok(new EntryDto { Id = createdEntry.Id, CheckIn = createdEntry.CheckIn, CheckOut = createdEntry.CheckOut });
+        return Results.Ok(createdEntry.ToDto());
     }
 }

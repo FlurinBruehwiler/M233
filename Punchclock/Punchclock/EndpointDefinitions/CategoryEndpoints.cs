@@ -1,3 +1,4 @@
+using Punchclock.Mapper;
 using Punchclock.Models.Db;
 using Punchclock.Models.Dto;
 using Punchclock.Services;
@@ -33,7 +34,7 @@ public class CategoryEndpoints : IEndpoints
         var patchedCategory = await categoryService.PutCategoryAsync(category);
         if (patchedCategory is null) return Results.BadRequest();
         await punchclockDbContext.SaveChangesAsync();
-        return Results.Ok(new CategoryDto { Id = patchedCategory.Id,Title = patchedCategory.Title});
+        return Results.Ok(patchedCategory.ToDto());
     }
 
     private async Task<IResult> DeleteCategory(long id, CategoryService categoryService, PunchclockDbContext punchclockDbContext)
@@ -45,13 +46,14 @@ public class CategoryEndpoints : IEndpoints
 
     private async Task<IResult> GetAllCategories(CategoryService categoryService)
     {
-        return Results.Ok(await categoryService.FindAllAsync());
+        var categories = await categoryService.FindAllAsync();
+        return Results.Ok(categories.Select(x => x.ToDto()).ToList());
     }
 
     private async Task<IResult> CreateCategory(CategoryDto category, CategoryService categoryService, PunchclockDbContext punchclockDbContext)
     {
         var createdCategory = categoryService.CreateCategory(category);
         await punchclockDbContext.SaveChangesAsync();
-        return Results.Ok(new CategoryDto { Id = createdCategory.Id, Title = createdCategory.Title});
+        return Results.Ok(createdCategory.ToDto());
     }
 }

@@ -1,3 +1,4 @@
+using Punchclock.Mapper;
 using Punchclock.Models.Db;
 using Punchclock.Models.Dto;
 using Punchclock.Services;
@@ -33,7 +34,7 @@ public class TagEndpoints : IEndpoints
         var patchedTag = await tagService.PutTagAsync(entry);
         if (patchedTag is null) return Results.BadRequest();
         await punchclockDbContext.SaveChangesAsync();
-        return Results.Ok(new TagDto { Id = patchedTag.Id,Title = patchedTag.Title});
+        return Results.Ok(patchedTag.ToDto());
     }
 
     private async Task<IResult> DeleteTag(long id, TagService tagService, PunchclockDbContext punchclockDbContext)
@@ -45,13 +46,14 @@ public class TagEndpoints : IEndpoints
 
     private async Task<IResult> GetAllTags(TagService tagService)
     {
-        return Results.Ok(await tagService.FindAllAsync());
+        var tags = await tagService.FindAllAsync();
+        return Results.Ok(tags.Select(x => x.ToDto()).ToList());
     }
 
     private async Task<IResult> CreateTag(TagDto tag, TagService tagService, PunchclockDbContext punchclockDbContext)
     {
         var createdTag = tagService.CreateTag(tag);
         await punchclockDbContext.SaveChangesAsync();
-        return Results.Ok(new TagDto { Id = createdTag.Id, Title = createdTag.Title});
+        return Results.Ok(createdTag.ToDto());
     }
 }
