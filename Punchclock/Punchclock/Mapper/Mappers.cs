@@ -13,7 +13,8 @@ public static class Mappers
             Category = entry.CategoryId,
             CheckIn = entry.CheckIn,
             CheckOut = entry.CheckOut,
-            Tags = entry.Tags.Select(y => y.Id).ToList()
+            // ReSharper disable once NullCoalescingConditionIsAlwaysNotNullAccordingToAPIContract
+            Tags = (entry.Tags ?? new List<Tag>()).Select(y => y.Id).ToList()
         };
     }
 
@@ -23,7 +24,7 @@ public static class Mappers
         {
             Id = category.Id,
             Title = category.Title,
-            Entries = category.Entries.Select(y => y.Id).ToList()
+            Entries = (category.Entries ?? new List<Entry>()).Select(y => y.Id).ToList()
         };
     }
 
@@ -33,7 +34,8 @@ public static class Mappers
         {
             Id = tag.Id,
             Title = tag.Title,
-            Entries = tag.Entries.Select(y => y.Id).ToList()
+            // ReSharper disable once NullCoalescingConditionIsAlwaysNotNullAccordingToAPIContract
+            Entries = (tag.Entries ?? new List<Entry>()).Select(y => y.Id).ToList()
         };
     }
 }

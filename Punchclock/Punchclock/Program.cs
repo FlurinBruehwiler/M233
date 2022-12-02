@@ -6,9 +6,9 @@ using Microsoft.IdentityModel.Tokens;
 using Punchclock.Configurations;
 using Punchclock.Errors;
 using Punchclock.Extensions;
-using Punchclock.Mapper;
 using Punchclock.Models.Db;
 using Punchclock.Models.Dto;
+using Punchclock.Repositories;
 using Punchclock.Services;
 using Punchclock.Validators;
 using static System.Text.Encoding;
@@ -24,6 +24,10 @@ builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<IValidator<CategoryDto>, CategoryValidators>();
 builder.Services.AddScoped<IValidator<EntryDto>, EntryValidators>();
 builder.Services.AddScoped<IValidator<TagDto>, TagValidators>();
+
+builder.Services.AddScoped<CategoryRepository>();
+builder.Services.AddScoped<TagRepository>();
+builder.Services.AddScoped<EntryRepository>();
 
 builder.Services.AddDbContext<PunchclockDbContext>(options =>
 {

@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using Punchclock.Errors;
 using Punchclock.Models.Db;
 using Punchclock.Models.Dto;
+using Punchclock.Repositories;
 
 namespace Punchclock.Services;
 
@@ -9,11 +9,16 @@ public class EntryService
 {
     private readonly PunchclockDbContext _punchclockDbContext;
     private readonly UserService _userService;
+    private readonly EntryRepository _entryRepository;
+    private readonly CategoryRepository _categoryRepository;
 
-    public EntryService(PunchclockDbContext punchclockDbContext, UserService userService)
+    public EntryService(PunchclockDbContext punchclockDbContext, UserService userService,
+        EntryRepository entryRepository, CategoryRepository categoryRepository)
     {
         _punchclockDbContext = punchclockDbContext;
         _userService = userService;
+        _entryRepository = entryRepository;
+        _categoryRepository = categoryRepository;
     }
 
     public async Task<Entry> CreateEntry(EntryDto newEntry)
@@ -41,30 +46,18 @@ public class EntryService
 
     public async Task DeleteEntryAsync(long id)
     {
-        var entryToRemove = await _punchclockDbContext.Entries
-            .FirstOrDefaultAsync(x => x.Id == id);
-
-        if (entryToRemove is null)
-            throw new BadRequestException(Errors.Errors.EntryNotFound);
-
-        if (entryToRemove.ApplicationUserId != _userService.GetUser().Id)
-            throw new BadRequestException(Errors.Errors.UserHasNoRights);
+        var entryToRemove = await _entryRepository.GetEntryById(id);
         
         _punchclockDbContext.Entries.Remove(entryToRemove);
     }
 
     public async Task<Entry?> PutEntryAsync(EntryDto patchedEntry)
     {
-        var entryToPatch = await _punchclockDbContext.Entries
-            .FirstOrDefaultAsync(x => x.Id == patchedEntry.Id);
-        if (entryToPatch is null)
-            throw new BadRequestException(Errors.Errors.EntryNotFound);
-        
-        if (entryToPatch.ApplicationUserId != _userService.GetUser().Id)
-            throw new BadRequestException(Errors.Errors.UserHasNoRights);
+        var entryToPatch = await _entryRepository.GetEntryById(patchedEntry.Id);
         
         entryToPatch.CheckIn = patchedEntry.CheckIn;
         entryToPatch.CheckOut = patchedEntry.CheckOut;
+        entryToPatch.Category = await _categoryRepository.GetCategoryById(patchedEntry.Category);
 
         return entryToPatch;
     }

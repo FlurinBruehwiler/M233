@@ -1,17 +1,19 @@
 using Microsoft.EntityFrameworkCore;
-using Punchclock.Errors;
 using Punchclock.Models.Db;
 using Punchclock.Models.Dto;
+using Punchclock.Repositories;
 
 namespace Punchclock.Services;
 
 public class TagService
 {
     private readonly PunchclockDbContext _punchclockDbContext;
+    private readonly TagRepository _tagRepository;
 
-    public TagService(PunchclockDbContext punchclockDbContext)
+    public TagService(PunchclockDbContext punchclockDbContext, TagRepository tagRepository)
     {
         _punchclockDbContext = punchclockDbContext;
+        _tagRepository = tagRepository;
     }
     
     public Tag CreateTag(TagDto newTag)
@@ -34,19 +36,13 @@ public class TagService
 
     public async Task DeleteTagAsync(long id)
     {
-        var tagToRemove = await _punchclockDbContext.Tags.FirstOrDefaultAsync(x => x.Id == id);
-        if (tagToRemove is null)
-            throw new BadRequestException(Errors.Errors.TagNotFound);
+        var tagToRemove = await _tagRepository.GetTagById(id);
         _punchclockDbContext.Tags.Remove(tagToRemove);
     }
 
     public async Task<Tag?> PutTagAsync(TagDto patchedTag)
     {
-        var tagToPatch = await _punchclockDbContext.Tags
-            .FirstOrDefaultAsync(x => x.Id == patchedTag.Id);
-
-        if (tagToPatch is null)
-            throw new BadRequestException(Errors.Errors.TagNotFound);
+        var tagToPatch = await _tagRepository.GetTagById(patchedTag.Id);
         
         tagToPatch.Title = patchedTag.Title;
 

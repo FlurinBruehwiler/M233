@@ -1,17 +1,19 @@
 using Microsoft.EntityFrameworkCore;
-using Punchclock.Errors;
 using Punchclock.Models.Db;
 using Punchclock.Models.Dto;
+using Punchclock.Repositories;
 
 namespace Punchclock.Services;
 
 public class CategoryService
 {
     private readonly PunchclockDbContext _punchclockDbContext;
+    private readonly CategoryRepository _categoryRepository;
 
-    public CategoryService(PunchclockDbContext punchclockDbContext)
+    public CategoryService(PunchclockDbContext punchclockDbContext, CategoryRepository categoryRepository)
     {
         _punchclockDbContext = punchclockDbContext;
+        _categoryRepository = categoryRepository;
     }
     
     public Category CreateCategory(CategoryDto newCategory)
@@ -34,18 +36,14 @@ public class CategoryService
 
     public async Task DeleteCategoryAsync(long id)
     {
-        var categoryToRemove = await _punchclockDbContext.Categories.FirstOrDefaultAsync(x => x.Id == id);
-        if (categoryToRemove is null)
-            throw new BadRequestException(Errors.Errors.CategoryNotFound);
+        var categoryToRemove = await _categoryRepository.GetCategoryById(id);
             
         _punchclockDbContext.Categories.Remove(categoryToRemove);
     }
 
     public async Task<Category?> PutCategoryAsync(CategoryDto patchedCategory)
     {
-        var categoryToPatch = await _punchclockDbContext.Categories.FirstOrDefaultAsync(x => x.Id == patchedCategory.Id);
-        if (categoryToPatch is null)
-            throw new BadRequestException(Errors.Errors.CategoryNotFound);
+        var categoryToPatch = await _categoryRepository.GetCategoryById(patchedCategory.Id);
         
         categoryToPatch.Title = patchedCategory.Title;
 
