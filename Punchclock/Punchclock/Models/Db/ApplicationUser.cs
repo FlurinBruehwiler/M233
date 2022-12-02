@@ -1,4 +1,4 @@
-namespace Punchclock.Models;
+namespace Punchclock.Models.Db;
 
 public class ApplicationUser
 {

@@ -1,6 +1,7 @@
-using Punchclock.Models;
+using Punchclock.Models.Db;
 using Punchclock.Models.Dto;
 using Punchclock.Services;
+using Punchclock.Validators.ValidationFramework;
 
 namespace Punchclock.EndpointDefinitions;
 
@@ -9,17 +10,21 @@ public class EntryEndpoints : IEndpoints
     public void DefineEndpoints(WebApplication app)
     {
         app.MapGet("/entries", GetAllEntries)
+            .RequireAuthorization()
             .WithOpenApi();
         
         app.MapPost("/entries", CreateEntry)
             .AddEndpointFilter<ValidatorFilter<EntryDto>>()
+            .RequireAuthorization()
             .WithOpenApi();
         
         app.MapDelete("/entries/{id:long}", DeleteEntry)
+            .RequireAuthorization()
             .WithOpenApi();
         
         app.MapPut("/entries", PutEntry)
             .AddEndpointFilter<ValidatorFilter<EntryDto>>()
+            .RequireAuthorization()
             .WithOpenApi();
     }
 

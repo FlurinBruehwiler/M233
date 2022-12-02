@@ -1,4 +1,4 @@
-namespace Punchclock;
+namespace Punchclock.Errors;
 
 public static class Errors
 {

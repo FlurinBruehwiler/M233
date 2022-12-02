@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using Punchclock.Models;
+using Punchclock.Errors;
+using Punchclock.Models.Db;
 using Punchclock.Models.Dto;
 
 namespace Punchclock.Services;
@@ -44,10 +45,10 @@ public class EntryService
             .FirstOrDefaultAsync(x => x.Id == id);
 
         if (entryToRemove is null)
-            throw new BadRequestException(Errors.EntryNotFound);
+            throw new BadRequestException(Errors.Errors.EntryNotFound);
 
         if (entryToRemove.ApplicationUserId != _userService.GetUser().Id)
-            throw new BadRequestException(Errors.UserHasNoRights);
+            throw new BadRequestException(Errors.Errors.UserHasNoRights);
         
         _punchclockDbContext.Entries.Remove(entryToRemove);
     }
@@ -57,10 +58,10 @@ public class EntryService
         var entryToPatch = await _punchclockDbContext.Entries
             .FirstOrDefaultAsync(x => x.Id == patchedEntry.Id);
         if (entryToPatch is null)
-            throw new BadRequestException(Errors.EntryNotFound);
+            throw new BadRequestException(Errors.Errors.EntryNotFound);
         
         if (entryToPatch.ApplicationUserId != _userService.GetUser().Id)
-            throw new BadRequestException(Errors.UserHasNoRights);
+            throw new BadRequestException(Errors.Errors.UserHasNoRights);
         
         entryToPatch.CheckIn = patchedEntry.CheckIn;
         entryToPatch.CheckOut = patchedEntry.CheckOut;

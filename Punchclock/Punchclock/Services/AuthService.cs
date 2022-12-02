@@ -3,7 +3,8 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using Punchclock.Models;
+using Punchclock.Configurations;
+using Punchclock.Models.Db;
 using static System.Text.Encoding;
 
 namespace Punchclock.Services;

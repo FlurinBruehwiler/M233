@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using Punchclock.Models;
+using Punchclock.Errors;
+using Punchclock.Models.Db;
 using Punchclock.Models.Dto;
 
 namespace Punchclock.Services;
@@ -33,7 +34,7 @@ public class TagService
     {
         var tagToRemove = await _punchclockDbContext.Tags.FirstOrDefaultAsync(x => x.Id == id);
         if (tagToRemove is null)
-            throw new BadRequestException(Errors.TagNotFound);
+            throw new BadRequestException(Errors.Errors.TagNotFound);
         _punchclockDbContext.Tags.Remove(tagToRemove);
     }
 
@@ -43,7 +44,7 @@ public class TagService
             .FirstOrDefaultAsync(x => x.Id == patchedTag.Id);
 
         if (tagToPatch is null)
-            throw new BadRequestException(Errors.TagNotFound);
+            throw new BadRequestException(Errors.Errors.TagNotFound);
         
         tagToPatch.Title = patchedTag.Title;
 

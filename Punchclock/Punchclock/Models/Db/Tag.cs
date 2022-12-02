@@ -1,6 +1,6 @@
-namespace Punchclock.Models;
+namespace Punchclock.Models.Db;
 
-public class Category
+public class Tag
 {
     public long Id { get; set; }
     public required string Title { get; set; }

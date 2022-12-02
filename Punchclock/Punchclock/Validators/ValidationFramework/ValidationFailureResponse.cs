@@ -1,6 +1,6 @@
 using FluentValidation.Results;
 
-namespace Punchclock;
+namespace Punchclock.Validators.ValidationFramework;
 
 public class ValidationFailureResponse
 {

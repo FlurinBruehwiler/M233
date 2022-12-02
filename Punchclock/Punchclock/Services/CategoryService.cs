@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using Punchclock.Models;
+using Punchclock.Errors;
+using Punchclock.Models.Db;
 using Punchclock.Models.Dto;
 
 namespace Punchclock.Services;
@@ -33,7 +34,7 @@ public class CategoryService
     {
         var categoryToRemove = await _punchclockDbContext.Categories.FirstOrDefaultAsync(x => x.Id == id);
         if (categoryToRemove is null)
-            throw new BadRequestException(Errors.CategoryNotFound);
+            throw new BadRequestException(Errors.Errors.CategoryNotFound);
             
         _punchclockDbContext.Categories.Remove(categoryToRemove);
     }
@@ -42,7 +43,7 @@ public class CategoryService
     {
         var categoryToPatch = await _punchclockDbContext.Categories.FirstOrDefaultAsync(x => x.Id == patchedCategory.Id);
         if (categoryToPatch is null)
-            throw new BadRequestException(Errors.CategoryNotFound);
+            throw new BadRequestException(Errors.Errors.CategoryNotFound);
         
         categoryToPatch.Title = patchedCategory.Title;
 

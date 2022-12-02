@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace Punchclock;
+namespace Punchclock.Validators.ValidationFramework;
 
 public class ValidatorFilter<T> : IEndpointFilter where T : class
 {

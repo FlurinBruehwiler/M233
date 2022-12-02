@@ -1,4 +1,4 @@
-namespace Punchclock;
+namespace Punchclock.Configurations;
 
 public class AuthenticationConfiguration
 {

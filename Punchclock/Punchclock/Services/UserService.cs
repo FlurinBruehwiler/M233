@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
-using Punchclock.Models;
+using Punchclock.Errors;
+using Punchclock.Models.Db;
 using Punchclock.Models.Dto;
 
 namespace Punchclock.Services;
@@ -20,14 +21,8 @@ public class UserService
     
     public async Task RegisterUser(UserDto userDto)
     {
-        if(string.IsNullOrWhiteSpace(userDto.Name))
-            throw new BadRequestException(Errors.UsernameEmpty);
-            
-        if(string.IsNullOrWhiteSpace(userDto.Password))
-            throw new BadRequestException(Errors.PasswordEmpty);
-        
         if (await _punchclockDbContext.Users.AnyAsync(x => x.Name == userDto.Name))
-            throw new BadRequestException(Errors.UsernameAlreadyExists);
+            throw new BadRequestException(Errors.Errors.UsernameAlreadyExists);
         
         _authService.CreatePasswordHash(userDto.Password, out var passwordHash, out var passwordSalt);
         var user = new ApplicationUser
@@ -37,7 +32,6 @@ public class UserService
             PasswordSalt = passwordSalt
         };
         _punchclockDbContext.Users.Add(user);
-        await _punchclockDbContext.SaveChangesAsync();
         _authService.AppendAccessToken(user);
     }
 
@@ -46,7 +40,7 @@ public class UserService
         var user = await GetUserByUsernameAsync(userDto.Name);
 
         if (!_authService.VerifyPasswordHash(userDto.Password, user.PasswordHash, user.PasswordSalt))
-            throw new BadRequestException(Errors.WrongPassword);
+            throw new BadRequestException(Errors.Errors.WrongPassword);
     
         _authService.AppendAccessToken(user);
     }
@@ -55,7 +49,7 @@ public class UserService
     {
         var user = await _punchclockDbContext.Users.FirstOrDefaultAsync(x => x.Name == username);
         if(user is null)
-            throw new BadRequestException(Errors.UserNotFound);
+            throw new BadRequestException(Errors.Errors.UserNotFound);
         return user;
     }
 
@@ -71,7 +65,7 @@ public class UserService
     {
         var username = GetUsername();
         if (username is null)
-            throw new BadRequestException(Errors.NoAuth);
+            throw new BadRequestException(Errors.Errors.NoAuth);
         return _punchclockDbContext.Users.FirstOrDefault(x => x.Name == username) ?? throw new Exception();
     }
 

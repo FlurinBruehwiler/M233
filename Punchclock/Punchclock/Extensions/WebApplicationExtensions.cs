@@ -1,6 +1,6 @@
 using Punchclock.EndpointDefinitions;
 
-namespace Punchclock;
+namespace Punchclock.Extensions;
 
 public static class WebApplicationExtensions
 {

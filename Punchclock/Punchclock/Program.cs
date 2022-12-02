@@ -3,8 +3,10 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Punchclock;
-using Punchclock.Models;
+using Punchclock.Configurations;
+using Punchclock.Errors;
+using Punchclock.Extensions;
+using Punchclock.Models.Db;
 using Punchclock.Models.Dto;
 using Punchclock.Services;
 using Punchclock.Validators;
@@ -55,6 +57,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             }
         };
     });
+builder.Services.AddAuthorization();
 
 
 var app = builder.Build();
@@ -76,8 +79,13 @@ app.UseExceptionHandler(appError =>
     });
 });
 
+
+
 app.UseSwagger();
 app.UseSwaggerUI();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.UseStaticFiles();
 
@@ -88,6 +96,7 @@ app.Run();
 namespace Punchclock
 {
     // ReSharper disable once PartialTypeWithSinglePart
+    // ReSharper disable once ClassNeverInstantiated.Global
     public partial class Program
     {
     }
