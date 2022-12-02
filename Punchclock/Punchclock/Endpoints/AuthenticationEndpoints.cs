@@ -4,7 +4,7 @@ using Punchclock.Models.Dto;
 using Punchclock.Services;
 using Punchclock.Validators.ValidationFramework;
 
-namespace Punchclock.EndpointDefinitions;
+namespace Punchclock.Endpoints;
 
 public class AuthenticationEndpoints : IEndpoints
 {

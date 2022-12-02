@@ -1,4 +1,4 @@
-using Punchclock.EndpointDefinitions;
+using Punchclock.Endpoints;
 
 namespace Punchclock.Extensions;
 

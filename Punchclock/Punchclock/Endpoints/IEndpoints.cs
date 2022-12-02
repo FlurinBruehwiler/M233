@@ -1,4 +1,4 @@
-namespace Punchclock.EndpointDefinitions;
+namespace Punchclock.Endpoints;
 
 public interface IEndpoints
 {
