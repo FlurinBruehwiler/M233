@@ -1,6 +1,7 @@
 using System.Security.Claims;
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
-using Projektarbeit.Endpoints.AuthenticationEndpoints;
+using Projektarbeit.Endpoints.AuthenticationEndpoints.Dtos;
 using Projektarbeit.Endpoints.UserEndpoints.Dtos;
 using Projektarbeit.Errors;
 using Projektarbeit.Models;
@@ -11,62 +12,72 @@ public class UserService
 {
     private readonly DatabaseContext _databaseContext;
     private readonly AuthService _authService;
-    private readonly HttpContextAccessor _contextAccessor;
+    private readonly IHttpContextAccessor _contextAccessor;
+    private readonly IValidator<User> _validator;
 
-    public UserService(DatabaseContext databaseContext, AuthService authService, HttpContextAccessor contextAccessor)
+    public UserService(DatabaseContext databaseContext,
+        AuthService authService,
+        IHttpContextAccessor contextAccessor,
+        IValidator<User> validator)
     {
         _databaseContext = databaseContext;
         _authService = authService;
         _contextAccessor = contextAccessor;
+        _validator = validator;
     }
-    
-    public async Task RegisterUser(UserDto userDto)
+
+    public async Task RegisterUser(RegisterRequestDto registerRequestDto)
     {
-        if (await _databaseContext.Users.AnyAsync(x => x.Name == userDto.Name))
+        if (await _databaseContext.Users.AnyAsync(x => x.Email == registerRequestDto.Email))
             throw new BadRequestException(Errors.Errors.UsernameAlreadyExists);
-        
-        _authService.CreatePasswordHash(userDto.Password, out var passwordHash, out var passwordSalt);
+
+        _authService.CreatePasswordHash(registerRequestDto.Password, out var passwordHash, out var passwordSalt);
         var user = new User
         {
-            Name = userDto.Name,
+            Email = registerRequestDto.Email,
             PasswordHash = passwordHash,
             PasswordSalt = passwordSalt,
-            Email = userDto.Email
+            Firstname = registerRequestDto.Firstname,
+            LastName = registerRequestDto.Lastname,
+            IsAdministrator = false
         };
+        var count = await _databaseContext.Users.CountAsync();
+        if (count == 0)
+            user.IsAdministrator = true;
         _databaseContext.Users.Add(user);
         _authService.AppendAccessToken(user);
     }
 
-    public async Task LoginUser(UserDto userDto)
+    public async Task LoginUser(LoginRequestDto loginRequestDto)
     {
-        var user = await GetUserByUsernameAsync(userDto.Name);
+        var user = await GetUserByEmailAsync(loginRequestDto.Email);
 
-        if (!_authService.VerifyPasswordHash(userDto.Password, user.PasswordHash, user.PasswordSalt))
+        if (!_authService.VerifyPasswordHash(loginRequestDto.Password, user.PasswordHash, user.PasswordSalt))
             throw new BadRequestException(Errors.Errors.WrongPassword);
-    
+
         _authService.AppendAccessToken(user);
     }
 
-    private async Task<User> GetUserByUsernameAsync(string username)
+    private async Task<User> GetUserByEmailAsync(string email)
     {
-        var user = await _databaseContext.Users.FirstOrDefaultAsync(x => x.Name == username);
-        if(user is null)
+        var user = await _databaseContext.Users.FirstOrDefaultAsync(x => x.Email == email);
+        if (user is null)
             throw new BadRequestException(Errors.Errors.UserNotFound);
         return user;
     }
 
-    private string? GetUsername()
+    private string? GetEmail()
     {
         return _contextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
     }
 
     public async Task<User> GetUser()
     {
-        var username = GetUsername();
-        if (username is null)
+        var email = GetEmail();
+        if (email is null)
             throw new BadRequestException(Errors.Errors.NoAuth);
 
-        var user = await _databaseContext.Users.FirstOrDefaultAsync(x => x.Name == username);
+        var user = await _databaseContext.Users.FirstOrDefaultAsync(x => x.Email == email);
         if (user is null)
             throw new BadRequestException(Errors.Errors.UserNotFound);
 
@@ -80,28 +91,30 @@ public class UserService
             .ToListAsync();
     }
 
-    public async Task<User> CreateUser(CreateUserRequestDto createUserTo)
+    public async Task<User> CreateUser(CreateUserRequestDto userToCreate)
     {
-        _authService.CreatePasswordHash(createUserTo.Password, out var passwordHash, out var passwordSalt);
+        _authService.CreatePasswordHash(userToCreate.Password, out var passwordHash, out var passwordSalt);
         var user = new User
         {
-            Email = createUserTo.Email,
-            Name = createUserTo.Name,
-            IsAdministrator = createUserTo.IsAdministrator,
+            Email = userToCreate.Email,
+            Firstname = userToCreate.Firstname,
+            LastName = userToCreate.Lastname,
+            IsAdministrator = userToCreate.IsAdministrator,
             Bookings = new List<Booking>(),
             PasswordHash = passwordHash,
             PasswordSalt = passwordSalt
         };
-        foreach (var bookingId in createUserTo.Bookings)
+        foreach (var bookingId in userToCreate.Bookings)
         {
             var booking = await _databaseContext.Bookings
                 .FirstOrDefaultAsync(x => x.Id == bookingId);
 
             if (booking is null)
                 throw new BadRequestException(Errors.Errors.BookingNotFound);
-            
+
             user.Bookings.Add(booking);
         }
+
         _databaseContext.Users.Add(user);
         await _databaseContext.SaveChangesAsync();
         return user;
@@ -113,7 +126,7 @@ public class UserService
 
         if (userToDelete is null)
             throw new BadRequestException(Errors.Errors.UserNotFound);
-        
+
         _databaseContext.Users.Remove(userToDelete);
     }
 
@@ -125,12 +138,15 @@ public class UserService
         if (userToPatch is null)
             throw new BadRequestException(Errors.Errors.UserNotFound);
 
-        if (patchUserRequestDto.Name is not null)
-            userToPatch.Name = patchUserRequestDto.Name;
-        
         if (patchUserRequestDto.Email is not null)
             userToPatch.Email = patchUserRequestDto.Email;
-        
+
+        if (patchUserRequestDto.Firstname is not null)
+            userToPatch.Firstname = patchUserRequestDto.Firstname;
+
+        if (patchUserRequestDto.Lastname is not null)
+            userToPatch.LastName = patchUserRequestDto.Lastname;
+
         if (patchUserRequestDto.IsAdministrator is not null)
             userToPatch.IsAdministrator = patchUserRequestDto.IsAdministrator.Value;
 
@@ -150,9 +166,14 @@ public class UserService
 
                 if (booking is null)
                     throw new BadRequestException(Errors.Errors.BookingNotFound);
-            
+
                 userToPatch.Bookings.Add(booking);
             }
         }
+    }
+
+    public bool IsValid(User user)
+    {
+        return _validator.Validate(user).IsValid;
     }
 }

@@ -1,5 +1,6 @@
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
-using Projektarbeit.Endpoints.BookingEndpoints;
+using Projektarbeit.Endpoints.BookingEndpoints.Dtos;
 using Projektarbeit.Errors;
 using Projektarbeit.Models;
 
@@ -9,11 +10,13 @@ public class BookingService
 {
     private readonly DatabaseContext _databaseContext;
     private readonly UserService _userService;
+    private readonly IValidator<Booking> _validator;
 
-    public BookingService(DatabaseContext databaseContext, UserService userService)
+    public BookingService(DatabaseContext databaseContext, UserService userService, IValidator<Booking> validator)
     {
         _databaseContext = databaseContext;
         _userService = userService;
+        _validator = validator;
     }
 
     public async Task<List<Booking>> GetAllBookings()
@@ -88,5 +91,10 @@ public class BookingService
 
             bookingToPatch.User = user;
         }
+    }
+
+    public bool IsValid(Booking booking)
+    {
+        return _validator.Validate(booking).IsValid;
     }
 }

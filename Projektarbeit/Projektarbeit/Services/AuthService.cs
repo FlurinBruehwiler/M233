@@ -25,7 +25,7 @@ public class AuthService
     {
         var claims = new List<Claim>
         {
-            new(ClaimTypes.NameIdentifier, user.Name)
+            new(ClaimTypes.NameIdentifier, user.Email)
         };
 
         if (user.IsAdministrator)
