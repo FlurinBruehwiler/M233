@@ -1,6 +1,6 @@
 using Projektarbeit.Models;
 
-namespace Projektarbeit.Endpoints.BookingEndpoints;
+namespace Projektarbeit.Endpoints.BookingEndpoints.Dtos;
 
 public class PatchBookingRequestDto
 {

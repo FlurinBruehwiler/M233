@@ -1,4 +1,6 @@
+using Projektarbeit.Endpoints.BookingEndpoints.Dtos;
 using Projektarbeit.Errors;
+using Projektarbeit.Filters;
 using Projektarbeit.Mappers;
 using Projektarbeit.Models;
 using Projektarbeit.Services;
@@ -14,10 +16,12 @@ public class BookingEndpoints : IEndpoints
             .WithOpenApi();
         
         app.MapPost("/bookings", CreateBooking)
+            .AddEndpointFilter<ValidatorFilter<CreateBookingRequestDto>>()
             .RequireAuthorization()
             .WithOpenApi();
         
         app.MapPatch("/bookings", PatchBooking)
+            .AddEndpointFilter<ValidatorFilter<PatchBookingRequestDto>>()
             .RequireAuthorization(AuthService.AdministratorRole)
             .WithOpenApi();
         
