@@ -1,4 +1,4 @@
-using Projektarbeit.Endpoints.BookingEndpoints;
+using Projektarbeit.Endpoints.BookingEndpoints.Dtos;
 using Projektarbeit.Endpoints.UserEndpoints.Dtos;
 using Projektarbeit.Models;
 
@@ -12,7 +12,8 @@ public static class Mappers
         {
             Id = user.Id,
             Email = user.Email,
-            Name = user.Name,
+            Firstname = user.Firstname,
+            Lastname = user.LastName,
             Bookings = user.Bookings.Select(x => x.Id).ToList()
         };
     }
@@ -21,7 +22,12 @@ public static class Mappers
     {
         return new BookingResponseDto
         {
-
+            Id = booking.Id,
+            Date = booking.Date,
+            Status = booking.Status,
+            Time = booking.Time,
+            User = booking.UserId,
+            ParticipationCount = booking.ParticipationCount
         };
     }
 }
