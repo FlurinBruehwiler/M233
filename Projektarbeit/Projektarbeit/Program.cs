@@ -1,25 +1,29 @@
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Http.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Projektarbeit.Configurations;
 using Projektarbeit.Endpoints.AuthenticationEndpoints;
+using Projektarbeit.Endpoints.AuthenticationEndpoints.Dtos;
+using Projektarbeit.Endpoints.BookingEndpoints;
+using Projektarbeit.Endpoints.BookingEndpoints.Dtos;
+using Projektarbeit.Endpoints.UserEndpoints;
+using Projektarbeit.Endpoints.UserEndpoints.Dtos;
 using Projektarbeit.Errors;
 using Projektarbeit.Extensions;
 using Projektarbeit.Models;
-using Projektarbeit.Models.Dto;
 using Projektarbeit.Services;
-using Projektarbeit.Validators;
+using Microsoft.OpenApi.Models;
+using Projektarbeit;
 using static System.Text.Encoding;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddScoped<BookingService>();
 builder.Services.AddScoped<UserService>();
-
-builder.Services.AddScoped<IValidator<UserDto>, UserDtoValidator>();
-builder.Services.AddScoped<IValidator<BookingDto>, BookingDtoValidator>();
+builder.Services.AddScoped<AuthService>();
 
 builder.Services.AddDbContext<DatabaseContext>(options =>
 {
@@ -27,8 +31,42 @@ builder.Services.AddDbContext<DatabaseContext>(options =>
     options.EnableSensitiveDataLogging();
 });
 
+builder.Services.Configure<JsonOptions>(options =>
+{
+    options.SerializerOptions.Converters.Add(new DateOnlyConverter());
+});
+
+builder.Services.AddScoped<IValidator<RegisterRequestDto>, RequestUserDtoValidator>();
+builder.Services.AddScoped<IValidator<CreateBookingRequestDto>, CreateBookingRequestDtoValidator>();
+builder.Services.AddScoped<IValidator<PatchBookingRequestDto>, PatchBookingRequestDtoValidator>();
+builder.Services.AddScoped<IValidator<CreateUserRequestDto>, CreateUserRequestDtoValidator>();
+builder.Services.AddScoped<IValidator<PatchUserRequestDto>, PatchUserRequestDtoValidator>();
+
+builder.Services.AddHttpContextAccessor();
+
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme {
+        In = ParameterLocation.Header, 
+        Description = "Please insert JWT with Bearer into field",
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey 
+    });
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement {
+        { 
+            new OpenApiSecurityScheme 
+            { 
+                Reference = new OpenApiReference 
+                { 
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer" 
+                } 
+            },
+            new string[] { } 
+        } 
+    });
+});
 builder.Services.Configure<AuthenticationConfiguration>(builder.Configuration.GetSection("Authentication"));
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
