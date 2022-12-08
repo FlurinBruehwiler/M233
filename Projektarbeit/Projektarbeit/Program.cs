@@ -1,16 +1,9 @@
-using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Projektarbeit.Configurations;
-using Projektarbeit.Endpoints.AuthenticationEndpoints;
-using Projektarbeit.Endpoints.AuthenticationEndpoints.Dtos;
-using Projektarbeit.Endpoints.BookingEndpoints;
-using Projektarbeit.Endpoints.BookingEndpoints.Dtos;
-using Projektarbeit.Endpoints.UserEndpoints;
-using Projektarbeit.Endpoints.UserEndpoints.Dtos;
 using Projektarbeit.Errors;
 using Projektarbeit.Extensions;
 using Projektarbeit.Models;
@@ -25,6 +18,8 @@ builder.Services.AddScoped<BookingService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<AuthService>();
 
+builder.Services.AddSingleton<SaveService>();
+
 builder.Services.AddDbContext<DatabaseContext>(options =>
 {
     options.UseSqlite("Data Source=db.db");
@@ -36,11 +31,7 @@ builder.Services.Configure<JsonOptions>(options =>
     options.SerializerOptions.Converters.Add(new DateOnlyConverter());
 });
 
-builder.Services.AddScoped<IValidator<RegisterRequestDto>, RequestUserDtoValidator>();
-builder.Services.AddScoped<IValidator<CreateBookingRequestDto>, CreateBookingRequestDtoValidator>();
-builder.Services.AddScoped<IValidator<PatchBookingRequestDto>, PatchBookingRequestDtoValidator>();
-builder.Services.AddScoped<IValidator<CreateUserRequestDto>, CreateUserRequestDtoValidator>();
-builder.Services.AddScoped<IValidator<PatchUserRequestDto>, PatchUserRequestDtoValidator>();
+builder.Services.AddSingleton<SaveService>();
 
 builder.Services.AddHttpContextAccessor();
 
@@ -108,7 +99,7 @@ app.UseExceptionHandler(appError =>
         context.Response.ContentType = "application/json";
         context.Response.StatusCode = StatusCodes.Status400BadRequest;
 
-        await context.Response.WriteAsJsonAsync(exception.Error);
+        await context.Response.WriteAsJsonAsync(exception.Errors);
     });
 });
 
