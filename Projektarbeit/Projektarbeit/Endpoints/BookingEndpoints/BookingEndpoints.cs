@@ -1,6 +1,5 @@
 using Projektarbeit.Endpoints.BookingEndpoints.Dtos;
 using Projektarbeit.Errors;
-using Projektarbeit.Filters;
 using Projektarbeit.Mappers;
 using Projektarbeit.Services;
 
@@ -15,13 +14,11 @@ public class BookingEndpoints : IEndpoints
             .WithOpenApi();
         
         app.MapPost("/bookings", CreateBooking)
-            .AddEndpointFilter<ValidatorFilter<CreateBookingRequestDto>>()
             .RequireAuthorization()
             .WithOpenApi();
         
         app.MapPatch("/bookings", PatchBooking)
-            .AddEndpointFilter<ValidatorFilter<PatchBookingRequestDto>>()
-            .RequireAuthorization(AuthService.AdministratorRole)
+            .RequireAuthorization()
             .WithOpenApi();
         
         app.MapDelete("/bookings/{id:int}", DeleteBooking)
@@ -43,7 +40,7 @@ public class BookingEndpoints : IEndpoints
         return Results.Ok();
     }
 
-    private async Task<IResult> CreateBooking(CreateBookingRequestDto bookingToCreate, UserService userService, BookingService bookingService)
+    private async Task<IResult> CreateBooking(CreateBookingRequestDto bookingToCreate, UserService userService, BookingService bookingService, SaveService saveService)
     {
         var user = await userService.GetUser();
 
@@ -54,6 +51,8 @@ public class BookingEndpoints : IEndpoints
 
         var createdBooking = await bookingService.CreateBooking(bookingToCreate);
 
+        await saveService.SaveChangesAndValidateAsync();
+        
         var createdBookingDto = createdBooking.ToResponseDto();
         
         return Results.Created("/bookings", createdBookingDto);

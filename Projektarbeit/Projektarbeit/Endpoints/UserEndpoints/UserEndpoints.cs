@@ -1,5 +1,4 @@
 using Projektarbeit.Endpoints.UserEndpoints.Dtos;
-using Projektarbeit.Filters;
 using Projektarbeit.Mappers;
 using Projektarbeit.Services;
 
@@ -14,12 +13,10 @@ public class UserEndpoints : IEndpoints
             .WithOpenApi();
         
         app.MapPost("/users", CreateUser)
-            .AddEndpointFilter<ValidatorFilter<CreateUserRequestDto>>()
             .RequireAuthorization(AuthService.AdministratorRole)
             .WithOpenApi();
         
         app.MapPatch("/users", PatchUser)
-            .AddEndpointFilter<ValidatorFilter<PatchUserRequestDto>>()
             .RequireAuthorization(AuthService.AdministratorRole)
             .WithOpenApi();
         
@@ -42,9 +39,10 @@ public class UserEndpoints : IEndpoints
         return Results.Ok();
     }
 
-    private async Task<IResult> CreateUser(CreateUserRequestDto createUserTo, UserService userService)
+    private async Task<IResult> CreateUser(CreateUserRequestDto createUserTo, UserService userService, SaveService saveService)
     {
         var createdUser = await userService.CreateUser(createUserTo);
+        await saveService.SaveChangesAndValidateAsync();
         var dtoUser = createdUser.ToResponseDto();
         return Results.Created("/users", dtoUser);
     }
