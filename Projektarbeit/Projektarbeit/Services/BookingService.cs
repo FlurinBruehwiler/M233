@@ -1,7 +1,7 @@
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Projektarbeit.Endpoints.BookingEndpoints.Dtos;
-using Projektarbeit.Errors;
+using Projektarbeit.Extensions;
 using Projektarbeit.Models;
 
 namespace Projektarbeit.Services;
@@ -11,12 +11,14 @@ public class BookingService
     private readonly DatabaseContext _databaseContext;
     private readonly UserService _userService;
     private readonly IValidator<Booking> _validator;
+    private readonly SaveService _saveService;
 
-    public BookingService(DatabaseContext databaseContext, UserService userService, IValidator<Booking> validator)
+    public BookingService(DatabaseContext databaseContext, UserService userService, IValidator<Booking> validator, SaveService saveService)
     {
         _databaseContext = databaseContext;
         _userService = userService;
         _validator = validator;
+        _saveService = saveService;
     }
 
     public async Task<List<Booking>> GetAllBookings()
@@ -45,17 +47,14 @@ public class BookingService
             ParticipationCount = bookingToCreate.ParticipationCount
         };
         _databaseContext.Bookings.Add(booking);
-        await _databaseContext.SaveChangesAsync();
+        await _saveService.SaveChangesAndValidateAsync();
         return booking;
     }
 
     public async Task DeleteBooking(int id)
     {
-        var bookingToDelete = await _databaseContext.Users.FirstOrDefaultAsync(x => x.Id == id);
-
-        if (bookingToDelete is null)
-            throw new BadRequestException(Errors.Errors.UserNotFound);
-
+        var bookingToDelete = await _databaseContext.Users.FirstOrNotFoundAsync(x => x.Id == id);
+        
         _databaseContext.Users.Remove(bookingToDelete);
     }
 
@@ -64,11 +63,8 @@ public class BookingService
         var currentUser = await _userService.GetUser();
         
         var bookingToPatch = await _databaseContext.Bookings
-            .FirstOrDefaultAsync(x => x.Id == patchUserRequestDto.Id);
-
-        if (bookingToPatch is null)
-            throw new BadRequestException(Errors.Errors.UserNotFound);
-
+            .FirstOrNotFoundAsync(x => x.Id == patchUserRequestDto.Id);
+        
         if (patchUserRequestDto.Date is not null)
             bookingToPatch.Date = patchUserRequestDto.Date.Value;
         
@@ -84,10 +80,7 @@ public class BookingService
         if (patchUserRequestDto.User is not null && currentUser.IsAdministrator)
         {
             var user = await _databaseContext.Users
-                .FirstOrDefaultAsync(x => x.Id == patchUserRequestDto.User);
-
-            if (user is null)
-                throw new BadRequestException(Errors.Errors.UserNotFound);
+                .FirstOrNotFoundAsync(x => x.Id == patchUserRequestDto.User);
 
             bookingToPatch.User = user;
         }

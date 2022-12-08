@@ -1,9 +1,9 @@
 using System.Security.Claims;
-using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Projektarbeit.Endpoints.AuthenticationEndpoints.Dtos;
 using Projektarbeit.Endpoints.UserEndpoints.Dtos;
 using Projektarbeit.Errors;
+using Projektarbeit.Extensions;
 using Projektarbeit.Models;
 
 namespace Projektarbeit.Services;
@@ -13,17 +13,17 @@ public class UserService
     private readonly DatabaseContext _databaseContext;
     private readonly AuthService _authService;
     private readonly IHttpContextAccessor _contextAccessor;
-    private readonly IValidator<User> _validator;
+    private readonly SaveService _saveService;
 
     public UserService(DatabaseContext databaseContext,
         AuthService authService,
         IHttpContextAccessor contextAccessor,
-        IValidator<User> validator)
+        SaveService saveService)
     {
         _databaseContext = databaseContext;
         _authService = authService;
         _contextAccessor = contextAccessor;
-        _validator = validator;
+        _saveService = saveService;
     }
 
     public async Task RegisterUser(RegisterRequestDto registerRequestDto)
@@ -60,9 +60,8 @@ public class UserService
 
     private async Task<User> GetUserByEmailAsync(string email)
     {
-        var user = await _databaseContext.Users.FirstOrDefaultAsync(x => x.Email == email);
-        if (user is null)
-            throw new BadRequestException(Errors.Errors.UserNotFound);
+        var user = await _databaseContext.Users.FirstOrNotFoundAsync(x => x.Email == email);
+
         return user;
     }
 
@@ -77,9 +76,7 @@ public class UserService
         if (email is null)
             throw new BadRequestException(Errors.Errors.NoAuth);
 
-        var user = await _databaseContext.Users.FirstOrDefaultAsync(x => x.Email == email);
-        if (user is null)
-            throw new BadRequestException(Errors.Errors.UserNotFound);
+        var user = await _databaseContext.Users.FirstOrNotFoundAsync(x => x.Email == email);
 
         return user;
     }
@@ -107,25 +104,19 @@ public class UserService
         foreach (var bookingId in userToCreate.Bookings)
         {
             var booking = await _databaseContext.Bookings
-                .FirstOrDefaultAsync(x => x.Id == bookingId);
-
-            if (booking is null)
-                throw new BadRequestException(Errors.Errors.BookingNotFound);
+                .FirstOrNotFoundAsync(x => x.Id == bookingId);
 
             user.Bookings.Add(booking);
         }
 
         _databaseContext.Users.Add(user);
-        await _databaseContext.SaveChangesAsync();
+        await _saveService.SaveChangesAndValidateAsync();
         return user;
     }
 
     public async Task DeleteUser(int id)
     {
-        var userToDelete = await _databaseContext.Users.FirstOrDefaultAsync(x => x.Id == id);
-
-        if (userToDelete is null)
-            throw new BadRequestException(Errors.Errors.UserNotFound);
+        var userToDelete = await _databaseContext.Users.FirstOrNotFoundAsync(x => x.Id == id);
 
         _databaseContext.Users.Remove(userToDelete);
     }
@@ -133,10 +124,7 @@ public class UserService
     public async Task PatchUser(PatchUserRequestDto patchUserRequestDto)
     {
         var userToPatch = await _databaseContext.Users
-            .FirstOrDefaultAsync(x => x.Id == patchUserRequestDto.Id);
-
-        if (userToPatch is null)
-            throw new BadRequestException(Errors.Errors.UserNotFound);
+            .FirstOrNotFoundAsync(x => x.Id == patchUserRequestDto.Id);
 
         if (patchUserRequestDto.Email is not null)
             userToPatch.Email = patchUserRequestDto.Email;
@@ -162,18 +150,10 @@ public class UserService
             foreach (var bookingId in patchUserRequestDto.Bookings)
             {
                 var booking = await _databaseContext.Bookings
-                    .FirstOrDefaultAsync(x => x.Id == bookingId);
-
-                if (booking is null)
-                    throw new BadRequestException(Errors.Errors.BookingNotFound);
+                    .FirstOrNotFoundAsync(x => x.Id == bookingId);
 
                 userToPatch.Bookings.Add(booking);
             }
         }
-    }
-
-    public bool IsValid(User user)
-    {
-        return _validator.Validate(user).IsValid;
     }
 }
