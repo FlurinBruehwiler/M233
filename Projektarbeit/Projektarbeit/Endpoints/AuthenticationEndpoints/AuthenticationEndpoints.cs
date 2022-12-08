@@ -1,8 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Projektarbeit.Endpoints.AuthenticationEndpoints.Dtos;
-using Projektarbeit.Endpoints.UserEndpoints.Dtos;
 using Projektarbeit.Filters;
-using Projektarbeit.Models;
 using Projektarbeit.Services;
 
 namespace Projektarbeit.Endpoints.AuthenticationEndpoints;
@@ -19,10 +17,10 @@ public class AuthenticationEndpoints : IEndpoints
             .WithOpenApi();
     }
 
-    private async Task<IResult> Register(RegisterRequestDto registerRequestDtoAuth, [FromServices] UserService userService, DatabaseContext punchclockDbContext)
+    private async Task<IResult> Register(RegisterRequestDto registerRequestDtoAuth, [FromServices] UserService userService, SaveService saveService)
     {
         await userService.RegisterUser(registerRequestDtoAuth);
-        await punchclockDbContext.SaveChangesAsync();
+        await saveService.SaveChangesAndValidateAsync();
         return Results.Ok();
     }
     

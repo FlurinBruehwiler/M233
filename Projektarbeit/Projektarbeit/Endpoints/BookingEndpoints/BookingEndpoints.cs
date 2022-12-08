@@ -2,7 +2,6 @@ using Projektarbeit.Endpoints.BookingEndpoints.Dtos;
 using Projektarbeit.Errors;
 using Projektarbeit.Filters;
 using Projektarbeit.Mappers;
-using Projektarbeit.Models;
 using Projektarbeit.Services;
 
 namespace Projektarbeit.Endpoints.BookingEndpoints;
@@ -30,17 +29,17 @@ public class BookingEndpoints : IEndpoints
             .WithOpenApi();
     }
 
-    private async Task<IResult> DeleteBooking(int id, BookingService bookingService, DatabaseContext databaseContext)
+    private async Task<IResult> DeleteBooking(int id, BookingService bookingService, SaveService saveService)
     {
         await bookingService.DeleteBooking(id);
-        await databaseContext.SaveChangesAsync();
+        await saveService.SaveChangesAndValidateAsync();
         return Results.Ok();
     }
 
-    private async Task<IResult> PatchBooking(PatchBookingRequestDto bookingToPatch, BookingService bookingService, DatabaseContext databaseContext)
+    private async Task<IResult> PatchBooking(PatchBookingRequestDto bookingToPatch, BookingService bookingService, SaveService saveService)
     {
         await bookingService.PatchBooking(bookingToPatch);
-        await databaseContext.SaveChangesAsync();
+        await saveService.SaveChangesAndValidateAsync();
         return Results.Ok();
     }
 
