@@ -13,17 +13,14 @@ public class UserService
     private readonly DatabaseContext _databaseContext;
     private readonly AuthService _authService;
     private readonly IHttpContextAccessor _contextAccessor;
-    private readonly SaveService _saveService;
 
     public UserService(DatabaseContext databaseContext,
         AuthService authService,
-        IHttpContextAccessor contextAccessor,
-        SaveService saveService)
+        IHttpContextAccessor contextAccessor)
     {
         _databaseContext = databaseContext;
         _authService = authService;
         _contextAccessor = contextAccessor;
-        _saveService = saveService;
     }
 
     public async Task RegisterUser(RegisterRequestDto registerRequestDto)
@@ -31,7 +28,7 @@ public class UserService
         if (await _databaseContext.Users.AnyAsync(x => x.Email == registerRequestDto.Email))
             throw new BadRequestException(Errors.Errors.UsernameAlreadyExists);
 
-        _authService.CreatePasswordHash(registerRequestDto.Password, out var passwordHash, out var passwordSalt);
+        AuthService.CreatePasswordHash(registerRequestDto.Password, out var passwordHash, out var passwordSalt);
         var user = new User
         {
             Email = registerRequestDto.Email,
@@ -90,7 +87,7 @@ public class UserService
 
     public async Task<User> CreateUser(CreateUserRequestDto userToCreate)
     {
-        _authService.CreatePasswordHash(userToCreate.Password, out var passwordHash, out var passwordSalt);
+        AuthService.CreatePasswordHash(userToCreate.Password, out var passwordHash, out var passwordSalt);
         var user = new User
         {
             Email = userToCreate.Email,
@@ -110,7 +107,6 @@ public class UserService
         }
 
         _databaseContext.Users.Add(user);
-        await _saveService.SaveChangesAndValidateAsync();
         return user;
     }
 
@@ -140,7 +136,7 @@ public class UserService
 
         if (patchUserRequestDto.Password is not null)
         {
-            _authService.CreatePasswordHash(patchUserRequestDto.Password, out var passwordHash, out var passwordSalt);
+            AuthService.CreatePasswordHash(patchUserRequestDto.Password, out var passwordHash, out var passwordSalt);
             userToPatch.PasswordHash = passwordHash;
             userToPatch.PasswordSalt = passwordSalt;
         }

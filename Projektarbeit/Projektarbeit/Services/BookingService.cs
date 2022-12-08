@@ -1,4 +1,3 @@
-using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Projektarbeit.Endpoints.BookingEndpoints.Dtos;
 using Projektarbeit.Extensions;
@@ -10,14 +9,12 @@ public class BookingService
 {
     private readonly DatabaseContext _databaseContext;
     private readonly UserService _userService;
-    private readonly IValidator<Booking> _validator;
     private readonly SaveService _saveService;
 
-    public BookingService(DatabaseContext databaseContext, UserService userService, IValidator<Booking> validator, SaveService saveService)
+    public BookingService(DatabaseContext databaseContext, UserService userService, SaveService saveService)
     {
         _databaseContext = databaseContext;
         _userService = userService;
-        _validator = validator;
         _saveService = saveService;
     }
 
@@ -47,7 +44,6 @@ public class BookingService
             ParticipationCount = bookingToCreate.ParticipationCount
         };
         _databaseContext.Bookings.Add(booking);
-        await _saveService.SaveChangesAndValidateAsync();
         return booking;
     }
 
@@ -84,10 +80,5 @@ public class BookingService
 
             bookingToPatch.User = user;
         }
-    }
-
-    public bool IsValid(Booking booking)
-    {
-        return _validator.Validate(booking).IsValid;
     }
 }
