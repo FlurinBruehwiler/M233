@@ -1,18 +1,18 @@
 using FluentValidation;
 using Projektarbeit.Models;
 
-namespace Projektarbeit.Endpoints.UserEndpoints;
+namespace Projektarbeit.Validators;
 
-public class FluentUserValidator : AbstractValidator<User>
+public class RequestUserDtoValidator : AbstractValidator<RegisterRequestDto>
 {
-    public FluentUserValidator()
+    public RequestUserDtoValidator()
     {
         RuleFor(x => x.Firstname)
             .NotEmpty()
             .MinimumLength(3)
             .MaximumLength(20);
         
-        RuleFor(x => x.LastName)
+        RuleFor(x => x.Lastname)
             .NotEmpty()
             .MinimumLength(3)
             .MaximumLength(20);
@@ -20,5 +20,10 @@ public class FluentUserValidator : AbstractValidator<User>
         RuleFor(x => x.Email)
             .NotEmpty()
             .EmailAddress();
+
+        RuleFor(x => x.Password)
+            .NotEmpty()
+            .MinimumLength(6)
+            .MaximumLength(20);
     }
 }

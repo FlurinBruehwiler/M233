@@ -1,9 +1,9 @@
-using Projektarbeit.Endpoints.BookingEndpoints.Dtos;
 using Projektarbeit.Errors;
 using Projektarbeit.Mappers;
+using Projektarbeit.Models;
 using Projektarbeit.Services;
 
-namespace Projektarbeit.Endpoints.BookingEndpoints;
+namespace Projektarbeit.Endpoints;
 
 public class BookingEndpoints : IEndpoints
 {

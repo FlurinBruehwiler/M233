@@ -1,7 +1,5 @@
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
-using Projektarbeit.Endpoints.AuthenticationEndpoints.Dtos;
-using Projektarbeit.Endpoints.UserEndpoints.Dtos;
 using Projektarbeit.Errors;
 using Projektarbeit.Extensions;
 using Projektarbeit.Models;
@@ -26,7 +24,7 @@ public class UserService
     public async Task RegisterUser(RegisterRequestDto registerRequestDto)
     {
         if (await _databaseContext.Users.AnyAsync(x => x.Email == registerRequestDto.Email))
-            throw new BadRequestException(Errors.Errors.UsernameAlreadyExists);
+            throw new BadRequestException(Errors.Errors.EmailAlreadyExists);
 
         AuthService.CreatePasswordHash(registerRequestDto.Password, out var passwordHash, out var passwordSalt);
         var user = new User

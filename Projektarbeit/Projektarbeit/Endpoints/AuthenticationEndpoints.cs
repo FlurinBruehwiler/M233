@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
-using Projektarbeit.Endpoints.AuthenticationEndpoints.Dtos;
 using Projektarbeit.Filters;
+using Projektarbeit.Models;
 using Projektarbeit.Services;
 
-namespace Projektarbeit.Endpoints.AuthenticationEndpoints;
+namespace Projektarbeit.Endpoints;
 
 public class AuthenticationEndpoints : IEndpoints
 {

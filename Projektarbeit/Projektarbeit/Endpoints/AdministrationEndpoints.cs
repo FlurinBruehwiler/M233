@@ -1,6 +1,6 @@
 using Projektarbeit.Services;
 
-namespace Projektarbeit.Endpoints.AdministrationEndpoints;
+namespace Projektarbeit.Endpoints;
 
 public class AdministrationEndpoints : IEndpoints
 {

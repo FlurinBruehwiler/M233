@@ -1,5 +1,3 @@
-using Projektarbeit.Endpoints.BookingEndpoints.Dtos;
-using Projektarbeit.Endpoints.UserEndpoints.Dtos;
 using Projektarbeit.Models;
 
 namespace Projektarbeit.Mappers;

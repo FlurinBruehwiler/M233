@@ -2,7 +2,6 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
-using Projektarbeit.Endpoints.AuthenticationEndpoints.Dtos;
 using Projektarbeit.Models;
 
 namespace Projektarbeit.Test.Tests;
@@ -42,7 +41,7 @@ public class BookingTests : IDisposable
         var jsonRes = await ResponseAsJsonAsync(response);
         Assert.Equal(1, jsonRes.GetArrayLength()); 
     }
-    
+
     [Fact]
     public async Task PostBookingAsAdministrator()
     {

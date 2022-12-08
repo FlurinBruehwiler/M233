@@ -2,8 +2,7 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
-using Projektarbeit.Endpoints.AuthenticationEndpoints.Dtos;
-using Projektarbeit.Endpoints.UserEndpoints.Dtos;
+using Projektarbeit.Models;
 
 namespace Projektarbeit.Test.Tests;
 

@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
+using Projektarbeit.Models;
 
-namespace Projektarbeit.Models;
+namespace Projektarbeit;
 
 public class DatabaseContext : DbContext
 {

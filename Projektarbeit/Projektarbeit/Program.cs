@@ -11,9 +11,8 @@ using Projektarbeit.Models;
 using Projektarbeit.Services;
 using Microsoft.OpenApi.Models;
 using Projektarbeit;
-using Projektarbeit.Endpoints.AuthenticationEndpoints;
-using Projektarbeit.Endpoints.AuthenticationEndpoints.Dtos;
 using Projektarbeit.TestData;
+using Projektarbeit.Validators;
 using static System.Text.Encoding;
 
 var builder = WebApplication.CreateBuilder(args);

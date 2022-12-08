@@ -1,6 +1,4 @@
-using Projektarbeit.Models;
-
-namespace Projektarbeit.Endpoints.BookingEndpoints.Dtos;
+namespace Projektarbeit.Models;
 
 public class BookingResponseDto
 {

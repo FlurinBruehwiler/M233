@@ -1,4 +1,4 @@
-namespace Projektarbeit.Endpoints.UserEndpoints.Dtos;
+namespace Projektarbeit.Models;
 
 public class UserResponseDto
 {

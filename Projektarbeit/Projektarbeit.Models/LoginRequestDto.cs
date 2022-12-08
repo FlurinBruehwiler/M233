@@ -1,4 +1,4 @@
-namespace Projektarbeit.Endpoints.AuthenticationEndpoints.Dtos;
+namespace Projektarbeit.Models;
 
 public class LoginRequestDto
 {

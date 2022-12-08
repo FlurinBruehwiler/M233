@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using Projektarbeit.Endpoints.BookingEndpoints.Dtos;
+using Projektarbeit.Errors;
 using Projektarbeit.Extensions;
 using Projektarbeit.Models;
 
@@ -60,6 +60,15 @@ public class BookingService
         
         var bookingToPatch = await _databaseContext.Bookings
             .FirstOrNotFoundAsync(x => x.Id == patchUserRequestDto.Id);
+
+        if (!currentUser.IsAdministrator && bookingToPatch.UserId != currentUser.Id)
+            throw new BadRequestException(new Error("Error", "Cannot modify someone elses booking"));
+        
+        if (bookingToPatch.Date < DateOnly.FromDateTime(DateTime.Now) || patchUserRequestDto.Date < DateOnly.FromDateTime(DateTime.Now))
+            throw new BadRequestException(new Error("CannotModifyBookingInPast", "A user cant modify a booking in the past"));
+        
+        if(!currentUser.IsAdministrator && bookingToPatch.Status is not Status.Beantragt)
+            throw new BadRequestException(new Error("Error", "Cannot change booking which is already approved or denied"));
         
         if (patchUserRequestDto.Date is not null)
             bookingToPatch.Date = patchUserRequestDto.Date.Value;
@@ -71,6 +80,9 @@ public class BookingService
             bookingToPatch.ParticipationCount = patchUserRequestDto.ParticipationCount.Value;
 
         if (patchUserRequestDto.Status is not null && currentUser.IsAdministrator)
+            bookingToPatch.Status = patchUserRequestDto.Status.Value;
+
+        if (patchUserRequestDto.Status is Status.Abgelehnt)
             bookingToPatch.Status = patchUserRequestDto.Status.Value;
 
         if (patchUserRequestDto.User is not null && currentUser.IsAdministrator)

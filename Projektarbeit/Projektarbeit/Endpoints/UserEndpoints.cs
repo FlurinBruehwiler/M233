@@ -1,8 +1,8 @@
-using Projektarbeit.Endpoints.UserEndpoints.Dtos;
 using Projektarbeit.Mappers;
+using Projektarbeit.Models;
 using Projektarbeit.Services;
 
-namespace Projektarbeit.Endpoints.UserEndpoints;
+namespace Projektarbeit.Endpoints;
 
 public class UserEndpoints : IEndpoints
 {
