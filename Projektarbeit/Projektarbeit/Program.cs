@@ -1,3 +1,4 @@
+using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http.Json;
@@ -10,15 +11,20 @@ using Projektarbeit.Models;
 using Projektarbeit.Services;
 using Microsoft.OpenApi.Models;
 using Projektarbeit;
+using Projektarbeit.Endpoints.AuthenticationEndpoints;
+using Projektarbeit.Endpoints.AuthenticationEndpoints.Dtos;
+using Projektarbeit.TestData;
+using Projektarbeit.Validators;
 using static System.Text.Encoding;
 
 var builder = WebApplication.CreateBuilder(args);
+
 
 builder.Services.AddScoped<BookingService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<AuthService>();
 
-builder.Services.AddSingleton<SaveService>();
+builder.Services.AddScoped<SaveService>();
 
 builder.Services.AddDbContext<DatabaseContext>(options =>
 {
@@ -31,7 +37,9 @@ builder.Services.Configure<JsonOptions>(options =>
     options.SerializerOptions.Converters.Add(new DateOnlyConverter());
 });
 
-builder.Services.AddSingleton<SaveService>();
+
+builder.Services.AddScoped<IValidator<RegisterRequestDto>, RequestUserDtoValidator>();
+
 
 builder.Services.AddHttpContextAccessor();
 
@@ -84,6 +92,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddHostedService<TestDataManager>();
+}
+
 var app = builder.Build();
 
 app.UseExceptionHandler(appError =>
@@ -112,6 +125,20 @@ app.UseAuthorization();
 app.UseStaticFiles();
 
 app.UseEndpoint();
+
+// SaveService.Validators = typeof(Program)
+//     .Assembly
+//     .ExportedTypes
+//     .Where(x => x.GetInterfaces()
+//         .Any(i => i.IsGenericType && 
+//                   i.GetGenericTypeDefinition() == typeof(ICustomValidator<>)))
+//     .Select(Activator.CreateInstance)
+//     .Cast<ICustomValidator<object>>()
+//     .GroupBy(x => x.GetType())
+//     .ToDictionary(x => x.Key
+//             .GetGenericArguments()
+//             .First(),
+//         x => x.AsEnumerable().ToList());
 
 app.Run();
 
