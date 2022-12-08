@@ -1,7 +1,6 @@
 using Projektarbeit.Endpoints.UserEndpoints.Dtos;
 using Projektarbeit.Filters;
 using Projektarbeit.Mappers;
-using Projektarbeit.Models;
 using Projektarbeit.Services;
 
 namespace Projektarbeit.Endpoints.UserEndpoints;
@@ -29,17 +28,17 @@ public class UserEndpoints : IEndpoints
             .WithOpenApi();
     }
 
-    private async Task<IResult> DeleteUser(int id, UserService userService, DatabaseContext databaseContext)
+    private async Task<IResult> DeleteUser(int id, UserService userService, SaveService saveService)
     {
         await userService.DeleteUser(id);
-        await databaseContext.SaveChangesAsync();
+        await saveService.SaveChangesAndValidateAsync();
         return Results.Ok();
     }
 
-    private async Task<IResult> PatchUser(PatchUserRequestDto patchUserRequestDto, UserService userService, DatabaseContext databaseContext)
+    private async Task<IResult> PatchUser(PatchUserRequestDto patchUserRequestDto, UserService userService, SaveService saveService)
     {
         await userService.PatchUser(patchUserRequestDto);
-        await databaseContext.SaveChangesAsync();
+        await saveService.SaveChangesAndValidateAsync();
         return Results.Ok();
     }
 
