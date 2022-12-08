@@ -17,7 +17,7 @@ namespace Projektarbeit.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.0");
 
-            modelBuilder.Entity("Projektarbeit.Models.Booking", b =>
+            modelBuilder.Entity("Projektarbeit.Projektarbeit.Models.Booking", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -47,7 +47,7 @@ namespace Projektarbeit.Migrations
                     b.ToTable("Bookings");
                 });
 
-            modelBuilder.Entity("Projektarbeit.Models.User", b =>
+            modelBuilder.Entity("Projektarbeit.Projektarbeit.Models.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -81,9 +81,9 @@ namespace Projektarbeit.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("Projektarbeit.Models.Booking", b =>
+            modelBuilder.Entity("Projektarbeit.Projektarbeit.Models.Booking", b =>
                 {
-                    b.HasOne("Projektarbeit.Models.User", "User")
+                    b.HasOne("Projektarbeit.Projektarbeit.Models.User", "User")
                         .WithMany("Bookings")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -92,7 +92,7 @@ namespace Projektarbeit.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Projektarbeit.Models.User", b =>
+            modelBuilder.Entity("Projektarbeit.Projektarbeit.Models.User", b =>
                 {
                     b.Navigation("Bookings");
                 });
