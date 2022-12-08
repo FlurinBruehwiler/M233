@@ -27,7 +27,7 @@ public class SaveService
         await _databaseContext.SaveChangesAsync();
     }
     
-    private async Task<List<Error>> ValidateChangedObjects()
+    private Task<List<Error>> ValidateChangedObjects()
     {
         List<Error> errors = new();
 
@@ -48,6 +48,6 @@ public class SaveService
         //         .SelectMany(x => x.Validate(entry, changedProperties, user).ToList()));
         // }
 
-        return errors;
+        return Task.FromResult(errors);
     }
 }

@@ -6,8 +6,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Projektarbeit.Test", "Proje
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Projektarbeit.Models", "Projektarbeit.Models\Projektarbeit.Models.csproj", "{C3C21472-9B54-43D9-8D3A-C5956A8D7D6B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Projektarbeit.Services", "Projektarbeit.Services\Projektarbeit.Services.csproj", "{0973EEDB-D954-484B-A7F7-A8C09C7A5B1D}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,9 +24,5 @@ Global
 		{C3C21472-9B54-43D9-8D3A-C5956A8D7D6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C3C21472-9B54-43D9-8D3A-C5956A8D7D6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C3C21472-9B54-43D9-8D3A-C5956A8D7D6B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0973EEDB-D954-484B-A7F7-A8C09C7A5B1D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0973EEDB-D954-484B-A7F7-A8C09C7A5B1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0973EEDB-D954-484B-A7F7-A8C09C7A5B1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0973EEDB-D954-484B-A7F7-A8C09C7A5B1D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

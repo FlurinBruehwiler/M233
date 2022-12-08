@@ -7,7 +7,7 @@ using Projektarbeit.Endpoints.UserEndpoints.Dtos;
 
 namespace Projektarbeit.Test.Tests;
 
-public class UserTests
+public class UserTests : IDisposable
 {
     private readonly string _adminToken;
     private readonly HttpClient _client;

@@ -115,16 +115,16 @@ public class TestDataManager : IHostedService
             scope.ServiceProvider.GetRequiredService<DatabaseContext>();
         foreach (var booking in _bookings)
         {
-            if(await databaseContext.Bookings.ContainsAsync(booking))
+            if(await databaseContext.Bookings.ContainsAsync(booking, cancellationToken: cancellationToken))
                 databaseContext.Bookings.Remove(booking);
         }
 
         foreach (var user in _users)
         {
-            if(await databaseContext.Users.ContainsAsync(user))
+            if(await databaseContext.Users.ContainsAsync(user, cancellationToken: cancellationToken))
                 databaseContext.Users.Remove(user);
         }
 
-        await databaseContext.SaveChangesAsync();
+        await databaseContext.SaveChangesAsync(cancellationToken);
     }
 }
